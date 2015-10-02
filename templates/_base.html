@@ -1,0 +1,65 @@
+<!-- 
+<html>
+  <head>
+    <title>Your Pictures Are Dumb</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script0001.js">
+    </script>
+  </head>
+  <body>
+    <h1>Your Pictures Are Dumb</h1>
+    <a href="/">Main Page</a> |
+    {% if user_email %}
+    <a href="/upload">Upload an Image</a> | <a href="{{ logout_url }}">Sign Out</a>
+    {% else %}
+    <a href="{{ login_url }}">Sign In</a>
+    {% endif %}
+    <br><br>
+
+{% block bodycontent %}{% endblock %}
+
+  </body>
+</html>
+ -->
+ 
+<html>
+
+	<head>
+	<title>Prowler</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- Latest compiled JavaScript -->
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	</head>
+
+	<body>
+
+	<nav class="navbar navbar-default" id="theNavBar">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavBar">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a id="logo" href=""><img width="115" height="55" src="/static/pictures/prowler_logo.png"> </img></a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavBar">
+				<ul class="nav navbar-nav">
+					<li class=""><a href="#">Link</a></li>
+					<li class=""><a href="#">Link</a></li>
+					<li class=""><a href="#">Link</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+					<li><a href="{{ login_url }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	</body>
+	
+</html>
