@@ -26,9 +26,9 @@
 
 	<head>
 	<title>Prowler</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/style.css">
 	<!-- jQuery library -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<!-- Latest compiled JavaScript -->
@@ -47,15 +47,19 @@
 				</button>
 				<a id="logo" href=""><img width="115" height="55" src="/static/pictures/prowler_logo.png"> </img></a>
 			</div>
-			<div class="collapse navbar-collapse" id="myNavBar">
+			<div class="collapse navbar-collapse" id="myNavBar" background="ffffff">
 				<ul class="nav navbar-nav">
-					<li class=""><a href="#">Link</a></li>
-					<li class=""><a href="#">Link</a></li>
-					<li class=""><a href="#">Link</a></li>
+					<li class=""><a href="#">North Oakland</a></li>
+					<li class=""><a href="#">Central Oakland</a></li>
+					<li class=""><a href="#">South Oakland</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+					<li><a href="https://accounts.google.com/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+					{% if user_email %}
+					<li><a href="{{ logout_url }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+					{% else %}
 					<li><a href="{{ login_url }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>
