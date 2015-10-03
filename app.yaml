@@ -1,12 +1,12 @@
 application: prowler-2015
-version: v2
+version: v1
 runtime: python27
 api_version: 1
 threadsafe: yes
 
 handlers:
 - url: /pictures
-  static_dir: /static/pictures
+  static_dir: static/pictures
 
 - url: /static
   static_dir: static
