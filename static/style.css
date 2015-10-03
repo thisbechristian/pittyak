@@ -88,3 +88,22 @@ theNavBar {
 .navbar-default .navbar-toggle .icon-bar {
     background-color: #ffffff;
 }
+
+#logo{
+	padding-right: 10px;
+}
+
+.modal-header, .modal-footer, .modal-header > .close{
+      background-color: #6699ff;
+      color:white;
+      padding-top: 5px;
+}
+
+#ContactForm{
+	padding: 15px;
+}
+
+.form-group > label{
+	color: #6699ff;
+	font-size: 20px;
+}
