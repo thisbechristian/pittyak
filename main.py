@@ -53,16 +53,16 @@ class ContactHandler(webapp2.RequestHandler):
 		email = "Email: " + self.request.get('email') + "\n"
 		comment = "Feedback: " + self.request.get('comment') + "\n"
 		comment = name + email + comment
-		
+		admin_emails = ["boni1331@gmail.com", "JosephDMcclain@gmail.com", "matthewrlobrien@gmail.com", "thorff1@gmail.com"]
 		if mail.is_email_valid(email):
-			message = mail.EmailMessage(
-				sender="boni1331@gmail.com",
-				subject="Feedback",
-				to="boni1331@gmail.com",
-				body=comment)
-			message.send()
+			for admin in admin_emails:		
+				message = mail.EmailMessage(
+					sender=admin,
+					subject="Feedback",
+					to=admin,
+					body=comment)
+				message.send()			
 		self.redirect('/')
-
 
 ###############################################################################
 class DumbHandler(webapp2.RequestHandler):

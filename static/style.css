@@ -1,36 +1,9 @@
-h1 {
-  font-family: Helvetica;
-  font-size: 24pt;
-}
-
-body {
-  font-family: Helvetica;
-  text-align: center;
-}
-
-h2 {
-  font-size: 18pt;
-}
-
-input {
-  width: 400px;
-}
-
-h3 {
-  font-size: 14pt;
-  font-weight: bold;
-  margin-bottom: 0px;
-}
-
-textarea {
-  width: 400px;
-  height: 200px;
-  margin-bottom: 10px;
-}
-
-theNavBar {
-  background-color: #ffcc66;
-  border-color: #ffffff;
+#theNavBar {
+	background-color: #6699ff;
+	border-color: #7d94f7;
+	font-family: "Helvetica Neue";
+	text-align: center;
+	font-size:16px;
 }
 
 .navbar-default {
