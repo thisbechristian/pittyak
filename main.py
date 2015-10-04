@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import images
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.api import mail
 
 ###############################################################################
 # We'll just use this convenience function to retrieve and render a template.
@@ -44,6 +45,23 @@ class MainPageHandler(webapp2.RequestHandler):
       'logout_url': users.create_logout_url('/')
     }
     render_template(self, 'index.html', page_params)
+
+###############################################################################
+class ContactHandler(webapp2.RequestHandler):
+	def post(self):
+		name = "Name: " + self.request.get('name') + "\n"
+		email = "Email: " + self.request.get('email') + "\n"
+		comment = "Feedback: " + self.request.get('comment') + "\n"
+		comment = name + email + comment
+		
+		if mail.is_email_valid(email):
+			message = mail.EmailMessage(
+				sender="boni1331@gmail.com",
+				subject="Feedback",
+				to="boni1331@gmail.com",
+				body=comment)
+			message.send()
+		self.redirect('/')
 
 
 ###############################################################################
@@ -223,6 +241,7 @@ mappings = [
   ('/dumb', DumbHandler),
   ('/notdumb', NotDumbHandler),
   ('/image', ImageDetailHandler),
-  ('/comment', CommentHandler)
+  ('/comment', CommentHandler),
+  ('/contact', ContactHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
