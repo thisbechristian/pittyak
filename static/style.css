@@ -128,7 +128,7 @@
 /* Centers the loading image, update top & left to 0.5*height & 0.5*width respectively*/
 #Loading{
 	position: fixed;
-	top: 20%;
+	top: 50%;
 	left: 50%;
 	margin-top: -75px;
 	margin-left: -100px;
