@@ -1,22 +1,26 @@
+<!-- 
 {% extends "_base.html" %}
 {% block bodycontent %}
 
 {% for image in images %}
-<a href="/image?id={{image.key.urlsafe}}"> <img src="\static\pictures\prowler_head.png" height="30" width="30"></a> {{image.count}} {% if image.count == 1 %}Point{% else %}Points{% endif %}   ||   {{image.comment_count}} {% if image.comment_count == 1 %}Comment{% else %}Comments{% endif %}
+<a href="/image?id={{image.key.urlsafe}}"><h3>{{ image.title }}</h3>
+<img src="{{image.image_url}}"></a><br>
+{{image.comment_count}} {% if image.comment_count == 1 %}comment{% else %}comments{% endif %}<br>
+{{image.count}} {% if image.count == 1 %}user thinks{% else %}users think{% endif %} this is dumb. 
 {% if user_email %}
-<i>
+<br><i>
 {% if image.voted %}
-<a href="/notdumb?id={{image.key.urlsafe}}"><span class="glyphicon glyphicon-thumbs-down"></span></a>
+I think it is. (<a href="/notdumb?id={{image.key.urlsafe}}">wait I changed my mind!</a>)
 {% else %}
-<a href="/dumb?id={{image.key.urlsafe}}"><span class="glyphicon glyphicon-thumbs-up"></span></a>
+I don't think it is. (<a href="/dumb?id={{image.key.urlsafe}}">wait, yes it is!</a>)
 {% endif %}
 </i>
 {% endif %}
 <br>
-{{ image.title }}<br> 
 {% empty %}
 There are no images.
 {% endfor %}
 
 {% endblock %}
-
+ 
+ -->

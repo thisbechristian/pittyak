@@ -35,8 +35,8 @@ class MainPageHandler(webapp2.RequestHandler):
     images = get_images()
     email = get_user_email()
     if email:
-      for image in images:
-        image.voted = image.is_voted(email)
+      comment = self.request.get('comment1')
+
 
     page_params = {
       'images': images,

@@ -1,14 +1,15 @@
-<!-- 
 {% extends "_base.html" %}
 {% block bodycontent %}
-<img src="\static\pictures\prowler_head.png" width="30" height="30">  {{image.count}} {% if image.count == 1 %}Point{% else %}Points{% endif %}   ||   {{image.comment_count}} {% if image.comment_count == 1 %}Comment{% else %}Comments{% endif %}<br>
+<!-- 
 <h3>{{image.title}}</h3>
-
+<img src="{{image.image_url}}"><br>
+{{image.count}} {% if image.count == 1 %}user thinks{% else %}users think{% endif %} this is dumb.<br>
+{{image.comment_count}} {% if image.comment_count == 1 %}comment{% else %}comments{% endif %}<br><br>
 {% for comment in image.comments %}
 <i>{{comment.time_created}}</i><br>
 {{comment.text}}<br><br>
 {% endfor %}
- 
+ -->
 {% if user_email %}
 <b>Add Comment</b><br>
 <form method="post" action="/comment">
@@ -18,4 +19,3 @@
 </form>
 {% endif %}
 {% endblock %}
- -->
