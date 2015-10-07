@@ -1,4 +1,4 @@
-application: prowler-2015
+application: pitt-yak
 version: v1
 runtime: python27
 api_version: 1
