@@ -68,7 +68,11 @@ class CommentHandler(webapp2.RequestHandler):
 class MapHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
+		lat = self.request.get("lat");
+		lng = self.request.get("lng");
 		page_params = {
+			'lat': lat,
+			'lng': lng,
 			'user_email': email,
 			'login_url': users.create_login_url(),
 			'logout_url': users.create_logout_url('/')

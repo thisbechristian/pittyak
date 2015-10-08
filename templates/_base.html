@@ -17,11 +17,7 @@
 	<link rel="icon" type="image/png" href="/pictures/favicon-16x16.png" sizes="16x16" />
 	</head>
 
-	<body>
-	
-	<div id="background">
-  		<img src="/pictures/zigzag.png" alt="">
-	</div>
+	<body background="/pictures/zigzag.png">
 
 	<nav class="navbar navbar-default" id="theNavBar">
 		<div class="container-fluid">
@@ -35,10 +31,11 @@
 			</div>
 			<div class="collapse navbar-collapse" id="myNavBar" background="ffffff">
 				<ul class="nav navbar-nav">
-					<li class=""><a href="#"> <span class="glyphicon glyphicon-chevron-up"></span> North Oakland</a></li>
-					<li class=""><a href="#">Central Oakland</a></li>
-					<li class=""><a href="#"><span class="glyphicon glyphicon-chevron-down"></span> South Oakland</a></li>
-					<li class=""><a href="/maps"><span class="glyphicon glyphicon-globe"></span> Maps</a></li>
+					<li class=""><a href="/maps?lat=40.446851&lng=-79.954787"> <span class="glyphicon glyphicon-chevron-up"></span> North Oakland</a></li>
+					<li class=""><a href="/maps?lat=40.438695&lng=-79.951710"><span class="glyphicon glyphicon-chevron-right"></span> Central Oakland</a></li>
+					<li class=""><a href="/maps?lat=40.438344&lng=-79.957729"><span class="glyphicon glyphicon-chevron-down"></span> South Oakland</a></li>
+					<li class=""><a href="/maps?lat=40.442249&lng=-79.956126"><span class="glyphicon glyphicon-book"></span> Campus</a></li>
+					<li class=""><a href="/maps"><span class="glyphicon glyphicon-globe"></span> Global</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class=""><a href="#" data-toggle="modal" data-target="#AboutModal"> <span class="glyphicon glyphicon-question-sign"></span> About</a></li>
