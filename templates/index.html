@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
 
-
+{% if user_email %}
 <div class="container-fluid">
 	<div class="row">
 	  <div class="col-xs-6 col-xs-offset-3">
@@ -18,7 +18,7 @@
 	  </div>
 	</div>
 </div>
-
+{% endif %}
 
 {% endblock %}
 

@@ -3,6 +3,7 @@
 	<head>
 	<title>Pitt Yak</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" /> 
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXmv9liESBIuHAupiW0gJF5sUyzxhHPA8&callback=initMap"async defer></script>
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<!-- jQuery library -->
@@ -10,7 +11,8 @@
 	<!-- Latest compiled JavaScript -->
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-	<script src="/static/script0001.js"></script>	
+	<script src="/static/script0001.js"></script>
+	<script src="/static/maps.js"></script>
 	<link rel="stylesheet" type="text/css" href="/static/style.css">
 	<link rel="icon" type="image/png" href="/pictures/favicon-32x32.png" sizes="32x32" />
 	<link rel="icon" type="image/png" href="/pictures/favicon-16x16.png" sizes="16x16" />
@@ -26,18 +28,20 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a id="logo" href=""><img width="160" height="75" src="/pictures/pittyak_logo.png"> </img></a>
+				<a id="logo" href="/"><img width="160" height="75" src="/pictures/pittyak_logo.png"> </img></a>
 			</div>
 			<div class="collapse navbar-collapse" id="myNavBar" background="ffffff">
 				<ul class="nav navbar-nav">
 					<li class=""><a href="#"> <span class="glyphicon glyphicon-chevron-up"></span> North Oakland</a></li>
 					<li class=""><a href="#">Central Oakland</a></li>
 					<li class=""><a href="#"><span class="glyphicon glyphicon-chevron-down"></span> South Oakland</a></li>
+					<li class=""><a href="/maps"><span class="glyphicon glyphicon-globe"></span> Maps</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class=""><a href="#" data-toggle="modal" data-target="#AboutModal"> <span class="glyphicon glyphicon-question-sign"></span> About</a></li>
 					<li class=""><a href="#" data-toggle="modal" data-target="#ContactModal"> <span class="glyphicon glyphicon-envelope"></span> Contact</a></li>
 					<li><a href="https://accounts.google.com/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+
 					{% if user_email %}
 					<li><a href="{{ logout_url }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 					{% else %}

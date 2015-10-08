@@ -13,29 +13,27 @@ from google.appengine.api import mail
 
 # We'll just use this convenience function to retrieve and render a template.
 def render_template(handler, templatename, templatevalues={}):
-  path = os.path.join(os.path.dirname(__file__), 'templates/' + templatename)
-  html = template.render(path, templatevalues)
-  handler.response.out.write(html)
+	path = os.path.join(os.path.dirname(__file__), 'templates/' + templatename)
+	html = template.render(path, templatevalues)
+	handler.response.out.write(html)
 
 # We'll use this convenience function to retrieve the current user's email.
 def get_user_email():
-  result = None
-  user = users.get_current_user()
-  if user:
-    result = user.email()
-  return result
+	result = None
+	user = users.get_current_user()
+	if user:
+		result = user.email()
+	return result
 
 class MainPageHandler(webapp2.RequestHandler):
-  def get(self):
-    email = get_user_email()
-
-    page_params = {
-      'user_email': email,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
-    }
-    render_template(self, 'index.html', page_params)
-
+	def get(self):
+		email = get_user_email()
+		page_params = {
+			'user_email': email,
+			'login_url': users.create_login_url(),
+			'logout_url': users.create_logout_url('/')
+		}
+		render_template(self, 'index.html', page_params)
 
 class ContactHandler(webapp2.RequestHandler):
 	def post(self):
@@ -55,29 +53,40 @@ class ContactHandler(webapp2.RequestHandler):
 		self.redirect('/')
   
 class CommentHandler(webapp2.RequestHandler):
-  def post(self):
-    email = get_user_email()
-#     if email: 
-#         text = self.request.get('comment')
-#         comment = ImageComment()
-#     	comment.user = user
-#     	comment.text = text
-#     	comment.put()
-#         self.redirect('/image?id=' + image_id)
-#     else:
-    self.redirect('/')
+	def post(self):
+		email = get_user_email()
+#     	if email: 
+#        	text = self.request.get('comment')
+#         	comment = ImageComment()
+#     		comment.user = user
+#     		comment.text = text
+#     		comment.put()
+#         	self.redirect('/image?id=' + image_id)
+#     	else:
+		self.redirect('/')
+    
+class MapHandler(webapp2.RequestHandler):
+	def get(self):
+		email = get_user_email()
+		page_params = {
+			'user_email': email,
+			'login_url': users.create_login_url(),
+			'logout_url': users.create_logout_url('/')
+		}
+		render_template(self, 'maps.html', page_params)
     
 class Comment(ndb.Model):
-  user = ndb.StringProperty()
-  text = ndb.TextProperty()
-  time_created = ndb.DateTimeProperty(auto_now_add=True)  
+	user = ndb.StringProperty()
+	text = ndb.TextProperty()
+	time_created = ndb.DateTimeProperty(auto_now_add=True)  
 
 class ImageVote(ndb.Model):
-  pass
+	pass
   
 mappings = [
-  ('/', MainPageHandler),
-  ('/comment', CommentHandler),
-  ('/contact', ContactHandler)
+	('/', MainPageHandler),
+	('/comment', CommentHandler),
+	('/contact', ContactHandler),
+	('/maps',MapHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
