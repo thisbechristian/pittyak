@@ -1,6 +1,33 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
 
+
+<div class="row">
+  <div class="col-xs-4 col-xs-offset-4">
+  
+  	<form class="form-inline" role="form">
+	  <div class="form-group">
+		<textarea id="PostTextArea" class="form-control" rows="1" name="post" placeholder="Whats on your mind?"></textarea>
+		<br><br><br>
+	  </div>
+  </div>
+	    <div class="col-xs-1">
+	  		<button type="submit" id="GrowlButton" class="btn btn-default">
+	  			 <span class="glyphicon glyphicon-pencil"></span>
+	  			<strong>Growl</strong>
+	  		</button>
+	  		<br><br><br><br>
+	  	</div>
+	</form>
+  
+  
+  </div>
+</div>
+
+{% endblock %}
+
+<!-- 
+
 {% for image in images %}
 <a href="/image?id={{image.key.urlsafe}}"> <img src="\static\pictures\prowler_head.png" height="30" width="30"></a> {{image.count}} {% if image.count == 1 %}Point{% else %}Points{% endif %}   ||   {{image.comment_count}} {% if image.comment_count == 1 %}Comment{% else %}Comments{% endif %}
 {% if user_email %}
@@ -18,5 +45,5 @@
 There are no images.
 {% endfor %}
 
-{% endblock %}
+ -->
 

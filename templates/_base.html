@@ -66,14 +66,6 @@
 		</div>
 	</div>
 	
-	<b>Add Comment</b><br>
-	<form id='comment_form' method="post" action="/comment">
-		<input type="hidden" name="image-id" value="{{image.key.urlsafe}}">
-		<textarea name="comment"></textarea><br>
-		<input type="submit">
-	</form>
-	
-	
 	<div id="ContactModal" class="modal fade" role="dialog">
 		<div class="modal-dialog modal-md">
 			
@@ -117,7 +109,8 @@
 	<div id="Loading"><img id="OnTheProwl" src="/pictures/prowler_head.png"> </img></div>
 	
 	<br><br>
-	<!-- {% block bodycontent %}{% endblock %} /-->
+	
+	{% block bodycontent %}{% endblock %}
 	
 	</body>
 	
