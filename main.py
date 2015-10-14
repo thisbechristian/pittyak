@@ -11,6 +11,7 @@ from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api import mail
 
+
 # We'll just use this convenience function to retrieve and render a template.
 def render_template(handler, templatename, templatevalues={}):
 	path = os.path.join(os.path.dirname(__file__), 'templates/' + templatename)
@@ -52,17 +53,15 @@ class ContactHandler(webapp2.RequestHandler):
 				message.send()			
 		self.redirect('/')
   
-class CommentHandler(webapp2.RequestHandler):
+class PostHandler(webapp2.RequestHandler):
 	def post(self):
 		email = get_user_email()
-#     	if email: 
-#        	text = self.request.get('comment')
-#         	comment = ImageComment()
-#     		comment.user = user
-#     		comment.text = text
-#     		comment.put()
-#         	self.redirect('/image?id=' + image_id)
-#     	else:
+##     	if email: 
+##        	text = self.request.get('comment')
+##     		post.user = user
+##     		post.text = text
+##     		post.put()
+##     	else:
 		self.redirect('/')
     
 class MapHandler(webapp2.RequestHandler):
@@ -79,17 +78,80 @@ class MapHandler(webapp2.RequestHandler):
 		}
 		render_template(self, 'maps.html', page_params)
     
-class Comment(ndb.Model):
+class Post(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
-	time_created = ndb.DateTimeProperty(auto_now_add=True)  
+	time_created = ndb.DateTimeProperty(auto_now_add=True)
 
-class ImageVote(ndb.Model):
+	def add_vote(self, user):
+                PostVote.get_or_insert(user, parent=self.key)
+
+        def remove_vote(self, user):
+                post_vote = PostVote.get_by_id(user, parent=self.key)
+                if post_vote:
+                        post_vote.key.delete()
+
+        def count_votes(self):
+                q = PostVote.query(ancestor=self.key)
+                return q.count()
+
+        def is_voted(self, user):
+                result = False
+                if PostVote.get_by_id(user, parent=self.key):
+                        result = True
+                return result
+
+        def create_sub(self, user, text):
+                sub = PostSub(parent=self.key)
+                sub.user = user
+                sub.text = text
+                sub.put()
+                return sub
+
+        def get_subs(self):
+                result = list()
+                q = PostSub.query(ancestor=self.key)
+                q = q.order(-PostSub.time_created)
+                for sub in q.fetch(1000):
+                        result.append(sub)
+                return result
+
+        def count_subs(self):
+                q = PostSub.query(ancestor=self.key)
+                return q.count()
+
+class PostVote(ndb.Model):
 	pass
-  
+
+class PostSub(ndb.Model):
+        user = ndb.StringProperty()
+        text = ndb.TextProperty
+        time_created = ndb.DateTimeProperty(auto_now_add=True)
+
+        def add_vote(self, user):
+                SubVote.get_or_insert(user, parent=self.key)
+
+        def remove_vote(self, user):
+                sub_vote = SubVote.get_by_id(user, parent=self.key)
+                if sub_vote:
+                        sub_vote.key.delete()
+
+        def count_votes(self):
+                q = SubVote.query(ancestor=self.key)
+                return q.count()
+
+        def is_voted(self, user):
+                result = False
+                if SubVote.get_by_id(user, parent=self.key):
+                        result = True
+                return result
+
+def get_post_key(post_id):
+        return ndb.Key(urlsafe=post_id).get()
+        
 mappings = [
 	('/', MainPageHandler),
-	('/comment', CommentHandler),
+	('/comment', PostHandler),
 	('/contact', ContactHandler),
 	('/maps',MapHandler)
 ]
