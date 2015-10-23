@@ -4,10 +4,10 @@
 {% if user_email %}
 <div class="container-fluid">
 	<div class="row">
-		<form class="form-inline" role="form">
-		  <div class="col-sm-6 col-sm-offset-3 col-xs-10">
+		<form class="form-inline" role="form" action="comment" method="post">
+		  <div class="col-sm-6 col-sm-offset-3 col-xs-9 col-xs-offset-1">
 			  <div class="form-group">
-				<textarea id="PostTextArea" class="form-control" rows="1" cols="150" name="post" placeholder="Whats on your mind?"></textarea>
+				<textarea id="PostTextArea" class="form-control" rows="1" cols="150" name="comment" placeholder="Whats on your mind?"></textarea>
 			  </div>
 		  </div>
 		  <div class="col-sm-1 col-xs-1">
@@ -19,6 +19,18 @@
 	</div>
 </div>
 {% endif %}
+
+{% for post in posts %}
+	<br><br><br>
+	<div class="row">
+		<div id="post" class="col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
+			<p> {{ post.text }} </p>
+		</div>
+	</div>
+	{% empty %}
+	There are no posts.
+{% endfor %}
+
 
 {% endblock %}
 

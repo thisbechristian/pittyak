@@ -29,10 +29,12 @@ def get_user_email():
 class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
+		posts = get_posts()
 		page_params = {
 			'user_email': email,
 			'login_url': users.create_login_url(),
-			'logout_url': users.create_logout_url('/')
+			'logout_url': users.create_logout_url('/'),
+			'posts': posts
 		}
 		render_template(self, 'index.html', page_params)
 
@@ -44,31 +46,31 @@ class ContactHandler(webapp2.RequestHandler):
 		comment = name + email + comment
 		admin_emails = ["boni1331@gmail.com", "JosephDMcclain@gmail.com", "matthewrlobrien@gmail.com", "thorff1@gmail.com"]
 		if mail.is_email_valid(email):
-			for admin in admin_emails:		
+			for admin in admin_emails:
 				message = mail.EmailMessage(
 					sender=admin,
 					subject="Feedback",
 					to=admin,
 					body=comment)
-				message.send()			
+				message.send()
 		self.redirect('/')
-  
+
 class PostHandler(webapp2.RequestHandler):
 	def post(self):
 		email = get_user_email()
-##     	if email: 
-##        	text = self.request.get('comment')
-##     		post.user = user
-##     		post.text = text
-##     		post.put()
-##     	else:
+		if email: 
+			post = Post(parent=get_post_ancestor())
+			text = self.request.get('comment')
+			post.user = email
+			post.text = text
+			post.put()
 		self.redirect('/')
-    
+
 class MapHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
-		lat = self.request.get("lat");
-		lng = self.request.get("lng");
+		lat = self.request.get("lat")
+		lng = self.request.get("lng")
 		page_params = {
 			'lat': lat,
 			'lng': lng,
@@ -77,78 +79,89 @@ class MapHandler(webapp2.RequestHandler):
 			'logout_url': users.create_logout_url('/')
 		}
 		render_template(self, 'maps.html', page_params)
-    
+	
 class Post(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
 	time_created = ndb.DateTimeProperty(auto_now_add=True)
-
+	
 	def add_vote(self, user):
-                PostVote.get_or_insert(user, parent=self.key)
+		PostVote.get_or_insert(user, parent=self.key)
 
-        def remove_vote(self, user):
-                post_vote = PostVote.get_by_id(user, parent=self.key)
-                if post_vote:
-                        post_vote.key.delete()
+	def remove_vote(self, user):
+		post_vote = PostVote.get_by_id(user, parent=self.key)
+		if post_vote:
+			post_vote.key.delete()
 
-        def count_votes(self):
-                q = PostVote.query(ancestor=self.key)
-                return q.count()
+	def count_votes(self):
+		q = PostVote.query(ancestor=self.key)
+		return q.count()
 
-        def is_voted(self, user):
-                result = False
-                if PostVote.get_by_id(user, parent=self.key):
-                        result = True
-                return result
+	def is_voted(self, user):
+		result = False
+		if PostVote.get_by_id(user, parent=self.key):
+			result = True
+		return result
 
-        def create_sub(self, user, text):
-                sub = PostSub(parent=self.key)
-                sub.user = user
-                sub.text = text
-                sub.put()
-                return sub
+	def create_sub(self, user, text):
+		sub = PostSub(parent=self.key)
+		sub.user = user
+		sub.text = text
+		sub.put()
+		return sub
 
-        def get_subs(self):
-                result = list()
-                q = PostSub.query(ancestor=self.key)
-                q = q.order(-PostSub.time_created)
-                for sub in q.fetch(1000):
-                        result.append(sub)
-                return result
+	def get_subs(self):
+		result = list()
+		q = PostSub.query(ancestor=self.key)
+		q = q.order(-PostSub.time_created)
+		for sub in q.fetch(1000):
+			result.append(sub)
+		return result
 
-        def count_subs(self):
-                q = PostSub.query(ancestor=self.key)
-                return q.count()
+	def count_subs(self):
+		q = PostSub.query(ancestor=self.key)
+		return q.count()
 
 class PostVote(ndb.Model):
 	pass
 
 class PostSub(ndb.Model):
-        user = ndb.StringProperty()
-        text = ndb.TextProperty
-        time_created = ndb.DateTimeProperty(auto_now_add=True)
+	user = ndb.StringProperty()
+	text = ndb.TextProperty()
+	time_created = ndb.DateTimeProperty(auto_now_add=True)
+	
+	def add_vote(self, user):
+		SubVote.get_or_insert(user, parent=self.key)
+		
+	def remove_vote(self, user):
+		sub_vote = SubVote.get_by_id(user, parent=self.key)
+		if sub_vote:
+			sub_vote.key.delete()
 
-        def add_vote(self, user):
-                SubVote.get_or_insert(user, parent=self.key)
+	def count_votes(self):
+		q = SubVote.query(ancestor=self.key)
+		return q.count()
 
-        def remove_vote(self, user):
-                sub_vote = SubVote.get_by_id(user, parent=self.key)
-                if sub_vote:
-                        sub_vote.key.delete()
-
-        def count_votes(self):
-                q = SubVote.query(ancestor=self.key)
-                return q.count()
-
-        def is_voted(self, user):
-                result = False
-                if SubVote.get_by_id(user, parent=self.key):
-                        result = True
-                return result
+	def is_voted(self, user):
+		result = False
+		if SubVote.get_by_id(user, parent=self.key):
+			result = True
+		return result
 
 def get_post_key(post_id):
-        return ndb.Key(urlsafe=post_id).get()
-        
+	return ndb.Key(urlsafe=post_id).get()
+    
+def get_posts():
+	result = list()
+	q = Post.query(ancestor=get_post_ancestor())
+	q = q.order(-Post.time_created)
+	for post in q.fetch(100):
+		result.append(post)
+	return result
+
+def get_post_ancestor():
+	return ndb.Key('Posts', 'Ancestor') 
+
 mappings = [
 	('/', MainPageHandler),
 	('/comment', PostHandler),
