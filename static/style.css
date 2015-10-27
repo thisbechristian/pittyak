@@ -1,4 +1,4 @@
- .thebackground img {
+.thebackground img {
     position: fixed;
     left: 0;
     top: 0;
@@ -222,3 +222,33 @@
 	border-radius:15px;
 	padding: 25px;
 }
+
+#votes a #upvoted{
+    color: green;
+}
+
+#votes a #downvoted{
+    color: red;
+}
+
+#votes a:link{
+    color: #6699ff;
+}
+
+#votes a:hover{
+	color: #ffcc66;
+}
+
+#votes {
+	text-align: center;
+	font-size:20px;
+}
+
+
+
+
+
+
+
+
+

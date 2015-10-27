@@ -30,6 +30,9 @@ class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
 		posts = get_posts()
+		for post in posts:
+			post.up_voted = post.is_up_voted(email)
+			post.down_voted = post.is_down_voted(email)
 		page_params = {
 			'user_email': email,
 			'login_url': users.create_login_url(),
@@ -79,27 +82,58 @@ class MapHandler(webapp2.RequestHandler):
 			'logout_url': users.create_logout_url('/')
 		}
 		render_template(self, 'maps.html', page_params)
-	
+
+class VoteHandler(webapp2.RequestHandler):
+	def get(self):
+		email = get_user_email()
+		if email:
+			vote = self.request.get("vote")
+			id = self.request.get("id")
+			post = get_post(id)
+			if(vote == 'up'):
+				post.add_up_vote(email)
+			elif(vote == 'down'):
+				post.add_down_vote(email)
+		self.redirect('/')
+			
+			
 class Post(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
 	time_created = ndb.DateTimeProperty(auto_now_add=True)
 	
-	def add_vote(self, user):
-		PostVote.get_or_insert(user, parent=self.key)
+	def add_up_vote(self, user):
+		self.remove_down_vote(user)
+		PostUpVote.get_or_insert(user, parent=self.key)
+		
+	def add_down_vote(self, user):
+		self.remove_up_vote(user)
+		PostDownVote.get_or_insert(user, parent=self.key)
 
-	def remove_vote(self, user):
-		post_vote = PostVote.get_by_id(user, parent=self.key)
+	def remove_up_vote(self, user):
+		post_vote = PostUpVote.get_by_id(user, parent=self.key)
+		if post_vote:
+			post_vote.key.delete()
+			
+	def remove_down_vote(self, user):
+		post_vote = PostDownVote.get_by_id(user, parent=self.key)
 		if post_vote:
 			post_vote.key.delete()
 
 	def count_votes(self):
-		q = PostVote.query(ancestor=self.key)
-		return q.count()
+		pos = PostUpVote.query(ancestor=self.key)
+		neg = PostDownVote.query(ancestor=self.key)
+		return (pos.count() - neg.count())
 
-	def is_voted(self, user):
+	def is_up_voted(self, user):
 		result = False
-		if PostVote.get_by_id(user, parent=self.key):
+		if PostUpVote.get_by_id(user, parent=self.key):
+			result = True
+		return result
+		
+	def is_down_voted(self, user):
+		result = False
+		if PostDownVote.get_by_id(user, parent=self.key):
 			result = True
 		return result
 
@@ -122,6 +156,12 @@ class Post(ndb.Model):
 		q = PostSub.query(ancestor=self.key)
 		return q.count()
 
+class PostUpVote(ndb.Model):
+	pass
+	
+class PostDownVote(ndb.Model):
+	pass
+	
 class PostVote(ndb.Model):
 	pass
 
@@ -148,7 +188,7 @@ class PostSub(ndb.Model):
 			result = True
 		return result
 
-def get_post_key(post_id):
+def get_post(post_id):
 	return ndb.Key(urlsafe=post_id).get()
     
 def get_posts():
@@ -157,6 +197,7 @@ def get_posts():
 	q = q.order(-Post.time_created)
 	for post in q.fetch(100):
 		result.append(post)
+		post.vote_count = post.count_votes()
 	return result
 
 def get_post_ancestor():
@@ -166,6 +207,7 @@ mappings = [
 	('/', MainPageHandler),
 	('/comment', PostHandler),
 	('/contact', ContactHandler),
+	('/vote', VoteHandler),
 	('/maps',MapHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)

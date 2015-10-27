@@ -24,7 +24,30 @@
 	<br><br><br>
 	<div class="row">
 		<div id="post" class="col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
-			<p> {{ post.text }} </p>
+			<div class="row">
+				<div class="col-sm-11 col-xs-10">
+					<p> {{ post.text }} </p>
+				</div>
+				<div id="votes" class="col-xs-1">
+					<a href="/vote?id={{post.key.urlsafe}}&vote=up">
+						{% if post.up_voted %}
+							<span id = "upvoted" class="glyphicon glyphicon-thumbs-up"></span>
+						{% else %}
+							<span class="glyphicon glyphicon-thumbs-up"></span>
+						{% endif %}
+					</a>
+					<br>
+					{{post.vote_count}}
+					<br>
+					<a href="/vote?id={{post.key.urlsafe}}&vote=down">
+						{% if post.down_voted %}
+							<span id = "downvoted" class="glyphicon glyphicon-thumbs-down"></span>
+						{% else %}
+							<span class="glyphicon glyphicon-thumbs-down"></span>
+						{% endif %}
+					</a>
+				</div>
+			</div>
 		</div>
 	</div>
 	{% empty %}
