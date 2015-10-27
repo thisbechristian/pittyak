@@ -30,9 +30,10 @@ class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
 		posts = get_posts()
-		for post in posts:
-			post.up_voted = post.is_up_voted(email)
-			post.down_voted = post.is_down_voted(email)
+		if email:
+			for post in posts:
+				post.up_voted = post.is_up_voted(email)
+				post.down_voted = post.is_down_voted(email)
 		page_params = {
 			'user_email': email,
 			'login_url': users.create_login_url(),
