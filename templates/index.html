@@ -26,7 +26,13 @@
 		<div id="post" class="col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">
 			<div class="row">
 				<div class="col-sm-11 col-xs-10">
-					<p> {{ post.text }} </p>
+					<p>
+						{{ post.text }}
+					</p>
+					<br><br>
+					<a href="#" data-toggle="modal" data-target="#ReplyModal" data-post="{{post.key.urlsafe}}">
+						<span class="glyphicon glyphicon-share">Reply</span>
+					</a>
 				</div>
 				<div id="votes" class="col-xs-1">
 					<a href="/vote?id={{post.key.urlsafe}}&vote=up">
@@ -50,10 +56,79 @@
 			</div>
 		</div>
 	</div>
+	
+	{% for sub in post.sub_comments %}
+		<br>
+		<div class="row">
+			<div id="post" class="col-sm-6 col-sm-offset-4 col-xs-9 col-xs-offset-2">
+				<div class="row">
+					<div class="col-sm-11 col-xs-10">
+						<p>
+							{{ sub.text }}
+						</p>
+					</div>
+					<div id="votes" class="col-xs-1">
+						<a href="/vote?id={{sub.key.urlsafe}}&vote=up">
+							{% if sub.up_voted %}
+								<span id = "upvoted" class="glyphicon glyphicon-thumbs-up"></span>
+							{% else %}
+								<span class="glyphicon glyphicon-thumbs-up"></span>
+							{% endif %}
+						</a>
+						<br>
+						{{sub.vote_count}}
+						<br>
+						<a href="/vote?id={{sub.key.urlsafe}}&vote=down">
+							{% if sub.down_voted %}
+								<span id = "downvoted" class="glyphicon glyphicon-thumbs-down"></span>
+							{% else %}
+								<span class="glyphicon glyphicon-thumbs-down"></span>
+							{% endif %}
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+	
 	{% empty %}
-	There are no posts.
+	No posts yet !
 {% endfor %}
 
+<div id="ReplyModal" class="modal fade" role="dialog">
+	<div class="modal-dialog modal-md">
+		
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h2 class="modal-title">Reply</h2>
+			</div>
+			<div class="modal-body">
+				<form id="ReplyForm" action="reply" method="post" class="form-horizontal" role="form">
+					<div class="form-group">
+						<label class="control-label col-xs-1" for="reply"><span class="glyphicon glyphicon-pencil"></span></label>
+						<div class="col-xs-11">
+							<textarea class="form-control" rows="5" name="reply" placeholder="Say something!"></textarea>
+						</div>
+						<input id="PostId" type="hidden" name="id"></input> 
+					</div>
+			</div>
+			
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-default">Reply</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$('#ReplyModal').on('show.bs.modal', function (event) {
+		var link = $(event.relatedTarget)
+		var post = link.data('post')
+		$("#PostId").val(post)
+	})
+</script>
 
 {% endblock %}
 

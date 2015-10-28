@@ -21,3 +21,9 @@ indexes:
   properties:
   - name: time_created
     direction: desc
+
+- kind: PostSub
+  ancestor: yes
+  properties:
+  - name: time_created
+    direction: desc

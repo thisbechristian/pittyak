@@ -81,6 +81,10 @@
       padding-top: 5px;
 }
 
+.modal-body textarea {
+	resize: none;
+}
+
 #ContactForm{
 	padding: 15px;
 }
@@ -212,30 +216,23 @@
 	box-shadow: 10px 10px 5px #888888;
 }
 
-#post p {
-	opacity:1;
-}
-
 #post {
-	background-color:white;
-	opacity:0.85;
+	background-color: rgba(255, 255, 255, 0.85);
+	border-style: solid;
+    border-color: rgba(255, 255, 255, 1);
 	border-radius:15px;
 	padding: 25px;
 }
 
-#votes a #upvoted{
+#votes a #upvoted {
     color: green;
 }
 
-#votes a #downvoted{
+#votes a #downvoted {
     color: red;
 }
 
-#votes a:link{
-    color: #6699ff;
-}
-
-#votes a:hover{
+#votes a:hover {
 	color: #ffcc66;
 }
 
