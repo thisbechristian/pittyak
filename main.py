@@ -31,6 +31,10 @@ class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
 		posts = models.get_posts()
+		admin_emails = ["boni1331@gmail.com", "josephdmcclain@gmail.com", "matthewrlobrien@gmail.com", "thorff1@gmail.com"]
+		adminFlag = False
+		if email in admin_emails:
+			adminFlag = True
 		for post in posts:
 			post.vote_count = post.count_votes()
 			post.sub_comments = post.get_subs()
@@ -46,7 +50,8 @@ class MainPageHandler(webapp2.RequestHandler):
 			'user_email': email,
 			'login_url': users.create_login_url(),
 			'logout_url': users.create_logout_url('/'),
-			'posts': posts
+			'posts': posts,
+			'adminFlag': adminFlag
 		}
 		render_template(self, 'index.html', page_params)
 
