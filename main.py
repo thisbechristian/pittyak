@@ -31,7 +31,7 @@ class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
 		posts = models.get_posts()
-		admin_emails = ["boni1331@gmail.com", "josephdmcclain@gmail.com", "matthewrlobrien@gmail.com", "thorff1@gmail.com"]
+		admin_emails = ["pittyak.mgmt@gmail.com"]
 		adminFlag = False
 		if email in admin_emails:
 			adminFlag = True
