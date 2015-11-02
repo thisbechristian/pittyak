@@ -33,6 +33,12 @@
 					<a href="#" data-toggle="modal" data-target="#ReplyModal" data-post="{{post.key.urlsafe}}">
 						<span class="glyphicon glyphicon-share">Reply</span>
 					</a>
+					{% if adminFlag %}
+					<br>
+					<form method='post' action='deletePost?id={{post.key.urlsafe}}'>
+						<button type='submit' id='delete'> Delete </button>	
+					</form>
+					{% endif %}
 				</div>
 				<div id="votes" class="col-xs-1">
 					<a href="/vote?id={{post.key.urlsafe}}&vote=up">
@@ -55,9 +61,7 @@
 				</div>
 			</div>
 		</div>
-		{% if adminFlag %}
-		<button id="delete" onclick=""> Delete </button>
-		{% endif %}
+		
 	</div>
 	
 	{% for sub in post.sub_comments %}

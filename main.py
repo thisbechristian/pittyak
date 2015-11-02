@@ -116,6 +116,14 @@ class VoteHandler(webapp2.RequestHandler):
 			elif(vote == 'down'):
 				post.add_down_vote(email)
 		self.redirect('/')
+	
+class DeletePostHandler(webapp2.RequestHandler):
+	def post(self):
+		id = self.request.get("id")
+		post = models.get_post(id)
+		post.delete_post()
+		
+		self.redirect('/')
 
 mappings = [
 	('/', MainPageHandler),
@@ -123,6 +131,7 @@ mappings = [
 	('/comment', PostHandler),
 	('/contact', ContactHandler),
 	('/vote', VoteHandler),
-	('/maps',MapHandler)
+	('/maps',MapHandler),
+	('/deletePost', DeletePostHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)

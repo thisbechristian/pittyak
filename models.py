@@ -61,6 +61,10 @@ class Post(ndb.Model):
 	def count_subs(self):
 		q = PostSub.query(ancestor=self.key)
 		return q.count()
+	
+	def delete_post(self):
+		self.key.delete()
+		memcache.delete('posts')
 
 class PostUpVote(ndb.Model):
 	pass
@@ -121,6 +125,7 @@ def create_post(user,text):
 	post.put()
 	memcache.delete('posts')
 	memcache.set(post.key.urlsafe(), post, namespace='post')
+	
 
 def get_post(post_id):
 	result = memcache.get(post_id, namespace='post')
