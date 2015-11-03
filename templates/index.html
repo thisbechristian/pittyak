@@ -43,23 +43,24 @@
 					{% endif %}
 				</div>
 				<div id="votes" class="col-xs-1">
-					<a href="/vote?id={{post.key.urlsafe}}&vote=up">
-						{% if post.up_voted %}
-							<span id = "upvoted" class="glyphicon glyphicon-thumbs-up"></span>
-						{% else %}
-							<span class="glyphicon glyphicon-thumbs-up"></span>
-						{% endif %}
+					{% if user_email %}
+					<a onclick="updateVote('{{post.key.urlsafe}}','up')">
+							{% if post.up_voted %}
+							<span id = "postupvoted_{{post.key.urlsafe}}" class="glyphicon glyphicon-thumbs-up" style="color:green"></span>
+							{% else %}
+							<span id = "postupvoted_{{post.key.urlsafe}}" class="glyphicon glyphicon-thumbs-up" style="color:blue"></span>
+							{% endif %}
 					</a>
 					<br>
-					{{post.vote_count}}
-					<br>
-					<a href="/vote?id={{post.key.urlsafe}}&vote=down">
-						{% if post.down_voted %}
-							<span id = "downvoted" class="glyphicon glyphicon-thumbs-down"></span>
-						{% else %}
-							<span class="glyphicon glyphicon-thumbs-down"></span>
-						{% endif %}
+					<p id='votecount_{{post.key.urlsafe}}'>{{post.vote_count}}</p>
+					<a onclick="updateVote('{{post.key.urlsafe}}','down')">
+							{% if post.down_voted %}
+							<span id = "postdownvoted_{{post.key.urlsafe}}" class="glyphicon glyphicon-thumbs-down" style="color:red"></span>
+							{% else %}
+							<span id = "postdownvoted_{{post.key.urlsafe}}" class="glyphicon glyphicon-thumbs-up" style="color:blue"></span>
+							{% endif %}
 					</a>
+					{% endif %}
 				</div>
 				
 			</div>
@@ -78,23 +79,24 @@
 						</p>
 					</div>
 					<div id="votes" class="col-xs-1">
-						<a href="/vote?id={{sub.key.urlsafe}}&vote=up">
+						{% if user_email %}
+						<a onclick="updateVote('{{sub.key.urlsafe}}','up')">
 							{% if sub.up_voted %}
-								<span id = "upvoted" class="glyphicon glyphicon-thumbs-up"></span>
+								<span id = "postupvoted_{{sub.key.urlsafe}}" class="glyphicon glyphicon-thumbs-up" style="color:green"></span>
 							{% else %}
-								<span class="glyphicon glyphicon-thumbs-up"></span>
+								<span id = "postupvoted_{{sub.key.urlsafe}}" class="glyphicon glyphicon-thumbs-up" style="color:blue"></span>
 							{% endif %}
 						</a>
 						<br>
-						{{sub.vote_count}}
-						<br>
-						<a href="/vote?id={{sub.key.urlsafe}}&vote=down">
+						<p id='votecount_{{sub.key.urlsafe}}'>{{sub.vote_count}}</p>
+						<a onclick="updateVote('{{sub.key.urlsafe}}','down')">
 							{% if sub.down_voted %}
-								<span id = "downvoted" class="glyphicon glyphicon-thumbs-down"></span>
+								<span id = "postdownvoted_{{sub.key.urlsafe}}" class="glyphicon glyphicon-thumbs-down" style="color:red"></span>
 							{% else %}
-								<span class="glyphicon glyphicon-thumbs-down"></span>
+								<span id = "postdownvoted_{{sub.key.urlsafe}}" class="glyphicon glyphicon-thumbs-up" style="color:blue"></span>
 							{% endif %}
 						</a>
+						{% endif %}
 					</div>
 					<br>
 					<p>Posted on: {{sub.time_created}}</p>
@@ -146,6 +148,46 @@
 		var post = link.data('post')
 		$("#PostId").val(post)
 	})
+	
+function createXmlHttp() {
+  var xmlhttp;
+  if (window.XMLHttpRequest) {
+    xmlhttp = new XMLHttpRequest();
+  } else {
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  if (!(xmlhttp)) {
+    alert("Your browser does not support AJAX!");
+  }
+  return xmlhttp;
+}
+	
+function postParameters(xmlHttp, target) {
+  if (xmlHttp) {
+    xmlHttp.open("GET",target,true);
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlHttp.send();
+   }
+}
+
+function updateVote(postKey,state) {
+  var xmlHttp = createXmlHttp();
+  xmlHttp.onreadystatechange=function() {
+    if(xmlHttp.readyState == 4) {
+      	document.getElementById('votecount_'+postKey).innerHTML = xmlHttp.responseText
+      	if (state=='down') {
+      		document.getElementById("postdownvoted_"+postKey).style.color = "red";
+      		document.getElementById("postupvoted_"+postKey).style.color = "blue";
+      	}
+      	if (state=='up') {
+      		document.getElementById("postupvoted_"+postKey).style.color = "green";
+      		document.getElementById("postdownvoted_"+postKey).style.color = "blue";
+      	}
+      }
+  }
+  postParameters(xmlHttp, "/vote?id=" + postKey + "&vote=" + state);
+  
+}		
 </script>
 
 

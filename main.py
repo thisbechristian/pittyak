@@ -115,7 +115,7 @@ class VoteHandler(webapp2.RequestHandler):
 				post.add_up_vote(email)
 			elif(vote == 'down'):
 				post.add_down_vote(email)
-		self.redirect('/')
+		self.response.out.write(post.count_votes())
 	
 class DeletePostHandler(webapp2.RequestHandler):
 	def post(self):

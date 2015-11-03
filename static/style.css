@@ -224,16 +224,9 @@
 	padding: 25px;
 }
 
-#votes a #upvoted {
-    color: green;
-}
 
-#votes a #downvoted {
-    color: red;
-}
-
-#votes a:hover {
-	color: #ffcc66;
+#votes {
+	color: orange;
 }
 
 #votes {
