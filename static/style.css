@@ -224,16 +224,19 @@
 	padding: 25px;
 }
 
-
 #votes {
+	text-align: center;
+	font-size:22px;
 	color: orange;
 }
 
-#votes {
-	text-align: center;
-	font-size:20px;
+#vote:hover {
+	cursor: pointer;
 }
 
+#postdate {
+	font-size:10px;
+}
 
 
 
