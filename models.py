@@ -1,4 +1,7 @@
+import time
 import logging
+
+
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
@@ -111,6 +114,10 @@ class PostSub(ndb.Model):
 		if SubPostDownVote.get_by_id(user, parent=self.key):
 			result = True
 		return result
+	
+	def delete_post(self):
+		self.key.delete()
+		memcache.delete('posts')
 		
 class SubPostUpVote(ndb.Model):
 	pass
