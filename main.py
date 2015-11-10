@@ -61,7 +61,7 @@ class ContactHandler(webapp2.RequestHandler):
 		email = "Email: " + self.request.get('email') + "\n"
 		comment = "Feedback: " + self.request.get('comment') + "\n"
 		comment = name + email + comment
-		admin_emails = ["boni1331@gmail.com", "josephdmcclain@gmail.com", "matthewrlobrien@gmail.com", "thorff1@gmail.com"]
+		admin_emails = ["pittyak.mgmt@gmail.com"]
 		if mail.is_email_valid(email):
 			for admin in admin_emails:
 				message = mail.EmailMessage(

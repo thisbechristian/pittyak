@@ -148,8 +148,8 @@
 }
 
 /* Code to force collapse the nav when it reaches a specific screen size*/
-/* 
-@media (max-width: 1200px) {
+/*
+@media (max-width: 200px) {
 	.navbar-header {
 		float: none;
 	}
@@ -185,7 +185,7 @@
 		display:block !important;
 	}
 }
- */
+*/
 
 #PostTextArea{
 	width: 100%;
