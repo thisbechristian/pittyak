@@ -2,15 +2,13 @@ import time
 import logging
 import datetime
 
-
-
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 class Post(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
-	time_created = ndb.DateTimeProperty(auto_now_add=True)
+	time_created = ndb.IntegerProperty()
 	
 	def add_up_vote(self, user):
 		self.remove_down_vote(user)
@@ -51,6 +49,7 @@ class Post(ndb.Model):
 		sub = PostSub(parent=self.key)
 		sub.user = user
 		sub.text = text
+		sub.time_created = int(time.time() * 1000)
 		sub.put()
 		return sub
 
@@ -79,7 +78,7 @@ class PostDownVote(ndb.Model):
 class PostSub(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
-	time_created = ndb.DateTimeProperty(auto_now_add=True)
+	time_created = ndb.IntegerProperty()
 	
 	def add_up_vote(self, user):
 		self.remove_down_vote(user)
@@ -125,15 +124,81 @@ class SubPostUpVote(ndb.Model):
 	
 class SubPostDownVote(ndb.Model):
 	pass
+
+def get_posts_as_json(email):
+	posts = get_posts()
+	for post in posts:
+		post.vote_count = post.count_votes()
+		post.sub_comments = post.get_subs()
+		if email:
+			post.up_voted = post.is_up_voted(email)
+			post.down_voted = post.is_down_voted(email)
+			post.mine = False
+			if post.user == email:
+				post.mine = True
+		for sub in post.sub_comments:
+			sub.vote_count = sub.count_votes()
+			if email:
+				sub.up_voted = sub.is_up_voted(email)
+				sub.down_voted = sub.is_down_voted(email)
+				sub.mine = False
+				if sub.user == email:
+					sub.mine = True
+	return build_posts_json(posts)
 		
+def build_posts_json(posts):
+	result = '['
+	first = True
+	for post in posts:
+		if first:
+			first = False
+		else:
+			result += ','
+		result += '{"text":"' + post.text + '",'
+		result += '"time":"' + str(post.time_created) + '",'
+		result += '"sub_comments":' + build_sub_posts_json(post) + ','
+		result += '"key":"' + post.key.urlsafe() + '",'
+		result += '"mine":"' + str(post.mine) + '",'
+		result += '"vote_count":"' + str(post.vote_count) + '",'
+		result += '"up_voted":"' + str(post.up_voted) + '",'
+		result += '"down_voted":"' + str(post.down_voted) + '"}'
+  	result += ']'
+	return '{"posts":' + result + '}'
+	
+def build_sub_posts_json(post):
+	result = '['
+	first = True
+	for sub in post.sub_comments:
+		if first:
+			first = False
+		else:
+			result += ','
+		result += '{"text":"' + sub.text + '",'
+		result += '"time":"' + str(sub.time_created) + '",'
+		result += '"key":"' + sub.key.urlsafe() + '",'
+		result += '"mine":"' + str(sub.mine) + '",'
+		result += '"vote_count":"' + str(sub.vote_count) + '",'
+		result += '"up_voted":"' + str(sub.up_voted) + '",'
+		result += '"down_voted":"' + str(sub.down_voted) + '"}'
+  	result += ']'
+  	return result;
+
 def create_post(user,text):
 	post = Post(parent=get_post_ancestor())
 	post.user = user
 	post.text = text
+	post.time_created = int(time.time() * 1000)
 	post.put()
 	memcache.delete('posts')
 	memcache.set(post.key.urlsafe(), post, namespace='post')
 	
+def delete_post(post):
+	if(type(post) is Post):
+		post.sub_comments = post.get_subs()
+		if post.sub_comments:
+			for sub in post.sub_comments:
+				sub.delete_post()
+	post.delete_post()
 
 def get_post(post_id):
 	result = memcache.get(post_id, namespace='post')
@@ -148,7 +213,7 @@ def get_posts():
 		result = list()
 		q = Post.query(ancestor=get_post_ancestor())
 		q = q.order(-Post.time_created)
-		for post in q.fetch(1000):
+		for post in q.fetch(500):
 			result.append(post)
 		memcache.set('posts',result)
 	return result

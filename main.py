@@ -30,30 +30,25 @@ def get_user_email():
 class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
-		posts = models.get_posts()
-		admin_emails = ["pittyak.mgmt@gmail.com"]
+		admin = "pittyak.mgmt@gmail.com"
 		adminFlag = False
-		if email in admin_emails:
+		if email == admin:
 			adminFlag = True
-		for post in posts:
-			post.vote_count = post.count_votes()
-			post.sub_comments = post.get_subs()
-			if email:
-				post.up_voted = post.is_up_voted(email)
-				post.down_voted = post.is_down_voted(email)
-			for sub in post.sub_comments:
-				sub.vote_count = sub.count_votes()
-				if email:
-					sub.up_voted = sub.is_up_voted(email)
-					sub.down_voted = sub.is_down_voted(email)
 		page_params = {
 			'user_email': email,
 			'login_url': users.create_login_url(),
 			'logout_url': users.create_logout_url('/'),
-			'posts': posts,
 			'adminFlag': adminFlag
 		}
 		render_template(self, 'index.html', page_params)
+		
+class GetPostHandler(webapp2.RequestHandler):
+	def post(self):
+		self.get()
+	
+	def get(self):
+		email = get_user_email()
+		self.response.out.write(models.get_posts_as_json(email))
 
 class ContactHandler(webapp2.RequestHandler):
 	def post(self):
@@ -105,7 +100,7 @@ class MapHandler(webapp2.RequestHandler):
 		render_template(self, 'maps.html', page_params)
 
 class VoteHandler(webapp2.RequestHandler):
-	def get(self):
+	def post(self):
 		email = get_user_email()
 		if email:
 			vote = self.request.get("vote")
@@ -115,23 +110,26 @@ class VoteHandler(webapp2.RequestHandler):
 				post.add_up_vote(email)
 			elif(vote == 'down'):
 				post.add_down_vote(email)
-		self.response.out.write(post.count_votes())
+		votes = post.count_votes()
+		if votes <= -5:
+			models.delete_post(post)
+		self.response.out.write(votes)
 	
 class DeletePostHandler(webapp2.RequestHandler):
-	def post(self):
+	def get(self):
 		id = self.request.get("id")
 		post = models.get_post(id)
-		post.delete_post()
-		
+		models.delete_post(post)
 		self.redirect('/')
 
 mappings = [
 	('/', MainPageHandler),
+	('/comments', GetPostHandler),
 	('/reply', SubPostHandler),
 	('/comment', PostHandler),
 	('/contact', ContactHandler),
 	('/vote', VoteHandler),
 	('/maps',MapHandler),
-	('/deletePost', DeletePostHandler)
+	('/delete', DeletePostHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
