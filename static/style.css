@@ -1,10 +1,19 @@
+.thebackground {
+	position: fixed; 
+	top: 0; 
+	left: 0;  
+  	width: 100%; 
+  	height: 100%;
+  	z-index:-9999;
+}
+
 .thebackground img {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.35;
+	position: absolute; 
+	top: 0; 
+	left: 0; 
+	width: 100%;
+	height: 100%;
+	opacity: 0.35;
 }
 
 #theNavBar {
@@ -148,8 +157,7 @@
 }
 
 /* Code to force collapse the nav when it reaches a specific screen size*/
-/*
-@media (max-width: 200px) {
+@media (max-width: 1000px) {
 	.navbar-header {
 		float: none;
 	}
@@ -185,7 +193,6 @@
 		display:block !important;
 	}
 }
-*/
 
 #PostTextArea{
 	width: 100%;
@@ -216,7 +223,7 @@
 	box-shadow: 10px 10px 5px #888888;
 }
 
-#post {
+#post, #login {
 	background-color: rgba(255, 255, 255, 0.85);
 	border-style: solid;
     border-color: rgba(255, 255, 255, 1);
@@ -238,10 +245,7 @@
 	font-size:10px;
 }
 
-
-
-
-
-
-
+#google {
+	width: 85%;
+}
 

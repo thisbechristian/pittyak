@@ -18,6 +18,20 @@
 </div>
 {% endif %}
 
+{% if not user_email %}
+<div class="container">
+	<div class="row">
+		<div class="col-sm-9 col-sm-offset-2 col-xs-9 col-xs-offset-1">
+			<div id="login" class="jumbotron">
+				<h1>Welcome to Pitt-Yak</h1>
+				<p>For best results, have your location services turned on</p>
+				<a href="{{ login_url }}"><img id="google" src="/pictures/google.png"></a>  
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+
 <div id="posts"></div>
 
 <div id="ReplyModal" class="modal fade" role="dialog">

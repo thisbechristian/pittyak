@@ -48,7 +48,8 @@ class GetPostHandler(webapp2.RequestHandler):
 	
 	def get(self):
 		email = get_user_email()
-		self.response.out.write(models.get_posts_as_json(email))
+		if email:
+			self.response.out.write(models.get_posts_as_json(email))
 
 class ContactHandler(webapp2.RequestHandler):
 	def post(self):

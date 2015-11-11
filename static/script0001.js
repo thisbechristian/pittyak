@@ -156,8 +156,8 @@ function convertPostToHtml(post) {
 	text +=	'<a href="#" data-toggle="modal" data-target="#ReplyModal" data-post="' + post.key + '">';
 	text +=	'<p class="glyphicon glyphicon-share-alt"></p>';
 	text +=	'</a>&nbsp&nbsp&nbsp';
-	if (post.sub_comments){
-		text +=	'<a class="glyphicon glyphicon-sort-by-attributes-alt" onclick="loadSubPostArea(\'' + post.key + '\')"></a>&nbsp&nbsp&nbsp';
+	if (post.sub_comments.length > 0){
+		text +=	'<a class="glyphicon glyphicon-sort-by-attributes-alt" onclick="toggleSubPostArea(\'' + post.key + '\')"></a>&nbsp&nbsp&nbsp';
 	}
 	if (admin || post.mine) {	
 		text += '<a href="delete?id=' + post.key + '">';
@@ -317,14 +317,9 @@ function loadPostArea() {
   	}
 }
 
-function loadSubPostArea(key){
-	var post = posts[key];
+function toggleSubPostArea(key){
 	var element = 'subpost-'+key;
 	var state = 'toggle-'+key;
-	var subs = post.sub_comments;
-	var text = '';
-	
-	console.log(getHtmlValue(state));
 	
 	if(getHtmlValue(state) === "active"){
 		$('#' + element).hide("slow");
@@ -333,7 +328,16 @@ function loadSubPostArea(key){
 	
 	else{
 		$('#' + element).show("slow");
-		setHtmlValue(state, "active")
+		setHtmlValue(state, "active");
+	}
+}
+
+function showSubPostArea(key){
+	var element = 'subpost-'+key;
+	var state = 'toggle-'+key;
+	if(getHtmlValue(state) === "inactive"){
+		$('#' + element).show("slow");
+		setHtmlValue(state, "active");
 	}
 }
 
@@ -403,7 +407,7 @@ function sendSubPost(){
 	if(text) {
 		if(text.length < 500){
 			clearText("ReplyTextArea");
-			sendData( {'reply': text, 'id': id} , '/reply', handlePost);
+			sendData( {'reply': text, 'id': id} , '/reply', handleSubPost);
 		}
 		else{
 			alert("Your post is wayyyyyyy too long!");
@@ -413,6 +417,12 @@ function sendSubPost(){
 
 function handlePost(xmlHttp, params) {
 	setTimeout('loadPosts()', 300);
+}
+
+function handleSubPost(xmlHttp, params) {
+	setTimeout('loadPosts()', 300);
+	var toggle = 'showSubPostArea("' + params['id'] + '")';
+	setTimeout(toggle, 1000);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

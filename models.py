@@ -125,6 +125,25 @@ class SubPostUpVote(ndb.Model):
 class SubPostDownVote(ndb.Model):
 	pass
 
+def clean(value):
+	result = ''
+	if value:
+		for i in range(0, len(value)):
+			c = value[i]
+			if c == "'":
+				result += '&#39;'
+			elif c == '<':
+				result += '&lt;'
+			elif c == '"':
+				result += '&quot;'
+			elif c == '\n':
+				result += '<br>'
+			elif c == '\\':
+				result += '\\\\'
+			else:
+				result += c
+	return result
+
 def get_posts_as_json(email):
 	posts = get_posts()
 	for post in posts:
@@ -154,7 +173,7 @@ def build_posts_json(posts):
 			first = False
 		else:
 			result += ','
-		result += '{"text":"' + post.text + '",'
+		result += '{"text":"' + clean(post.text) + '",'
 		result += '"time":"' + str(post.time_created) + '",'
 		result += '"sub_comments":' + build_sub_posts_json(post) + ','
 		result += '"key":"' + post.key.urlsafe() + '",'
@@ -163,7 +182,8 @@ def build_posts_json(posts):
 		result += '"up_voted":"' + str(post.up_voted) + '",'
 		result += '"down_voted":"' + str(post.down_voted) + '"}'
   	result += ']'
-	return '{"posts":' + result + '}'
+  	complete = '{"posts":' + result + '}'
+	return complete
 	
 def build_sub_posts_json(post):
 	result = '['
@@ -173,7 +193,7 @@ def build_sub_posts_json(post):
 			first = False
 		else:
 			result += ','
-		result += '{"text":"' + sub.text + '",'
+		result += '{"text":"' + clean(sub.text) + '",'
 		result += '"time":"' + str(sub.time_created) + '",'
 		result += '"key":"' + sub.key.urlsafe() + '",'
 		result += '"mine":"' + str(sub.mine) + '",'
