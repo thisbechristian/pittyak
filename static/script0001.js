@@ -132,11 +132,11 @@ function getRelativeTime(time) {
 	
 	else if (diff < (7 * 24 * 60 * 60)){
 		var days = Math.round(diff / (24 * 60 * 60));
-		if(hours == 1){
+		if(days == 1){
 			result = '1 day ago';
 		}
 		else{
-			result = hours + ' days ago';
+			result = days + ' days ago';
 		}
 	}
 	return result;
