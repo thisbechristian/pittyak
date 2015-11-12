@@ -107,7 +107,12 @@ function getRelativeTime(time) {
 	var diff = (now - time) / 1000;
 	
 	if (diff < 60){
-		result = 'a few seconds ago';
+		if(diff == 1){
+			result = '1 second ago'
+		}
+		else{
+			result = diff + ' seconds ago';
+		}
 	}
 	
 	else if (diff < (60 * 60)){
@@ -139,6 +144,17 @@ function getRelativeTime(time) {
 			result = days + ' days ago';
 		}
 	}
+	
+	else {
+		var weeks = Math.round(diff / (7 * 24 * 60 * 60));
+		if(weeks == 1){
+			result = '1 week ago';
+		}
+		else{
+			result = weeks + ' weeks ago';
+		}
+	}
+	
 	return result;
 }
 
