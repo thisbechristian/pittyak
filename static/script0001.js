@@ -5,7 +5,7 @@ var lastPost = 0;
 var login = false;
 var admin = false;
 var windowScrollPositionY = 0;
-var inOrder = true;
+var timeOrder = true;
 
 $(window).load(function() {
 	$("#Loading").delay(500).fadeOut("slow");
@@ -111,7 +111,7 @@ function getRelativeTime(time) {
 			result = '1 second ago'
 		}
 		else{
-			result = diff + ' seconds ago';
+			result = Math.round(diff) + ' seconds ago';
 		}
 	}
 	
@@ -255,6 +255,17 @@ function convertSubPostToHtml(post) {
 ////////////////////////////////////////////////////////////////////////////////////
 //sort comments
 
+function toggleSort(time){
+	if(time && !timeOrder){
+		timeOrder = true;
+		setTimeout('loadPosts()', 250);
+	}
+	else if(!time && timeOrder){
+		timeOrder = false;
+		setTimeout('loadPosts()', 250);
+	}
+}
+
 function swap(array, i0, i1) {
 	var temp = array[i0];
 	array[i0] = array[i1];
@@ -302,18 +313,34 @@ function getReverseSortedPosts() {
 	return sortedPosts;
 }
 
+function getTopVoteSortedPosts() {
+	var sortedPosts = new Array();
+	for(var key in posts){
+		var p = posts[key];
+		var i = sortedPosts.length;
+		sortedPosts.push(p);
+		while(i > 0 && sortedPosts[i].vote_count > sortedPosts[i - 1].vote_count){
+			swap(sortedPosts, i, i-1);
+			i--;
+		}
+	}
+	return sortedPosts;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////
 //handle loading comments
 
 function loadPostArea() {
-	var sorted = getReverseSortedPosts();
+	var sorted = timeOrder ? getReverseSortedPosts() : getTopVoteSortedPosts();
 	var text = '';
 	for (var i = 0; i < sorted.length; i++) {
     	text += convertPostToHtml(sorted[i]);
   	}
+  	$('#posts').hide();
   	setHtml('posts', text);
+  	$('#posts').fadeIn(600);
   	
   	for (var i = 0; i < sorted.length; i++) {
     	var subs = sorted[i].sub_comments;
