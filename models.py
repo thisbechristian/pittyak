@@ -130,14 +130,18 @@ class SubPostDownVote(ndb.Model):
 	pass
 
 def generate_sub_number(post, user):  ##make sure there is only one picture per user
-        number = randint(1,100)
         if user == post.user:
                 return 0
         else:
-                for sub in post.sub_comments:
-                        if user == sub.user:
-                                return sub.profile_picture
-        return number
+                number = randint(1,100)
+                search = True
+                while search:
+                        for sub in post.sub_comments:
+                                if user == sub.user:
+                                        return sub.profile_picture
+                                if number.profile_picture == number:
+                                        number = randint(1,100)
+                return number
 
 def clean(value):
 	result = ''
