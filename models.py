@@ -2,6 +2,7 @@ import time
 import logging
 import datetime
 
+from random import randint
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
@@ -9,6 +10,7 @@ class Post(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
 	time_created = ndb.IntegerProperty()
+        profile_picture = ndb.IntegerProperty()
 	
 	def add_up_vote(self, user):
 		self.remove_down_vote(user)
@@ -50,6 +52,7 @@ class Post(ndb.Model):
 		sub.user = user
 		sub.text = text
 		sub.time_created = int(time.time() * 1000)
+		sub.profile_picture = generate_sub_number(self, user)
 		sub.put()
 		return sub
 
@@ -79,6 +82,7 @@ class PostSub(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
 	time_created = ndb.IntegerProperty()
+	profile_picture = ndb.IntegerProperty()
 	
 	def add_up_vote(self, user):
 		self.remove_down_vote(user)
@@ -124,6 +128,16 @@ class SubPostUpVote(ndb.Model):
 	
 class SubPostDownVote(ndb.Model):
 	pass
+
+def generate_sub_number(post, user):  ##make sure there is only one picture per user
+        number = randint(1,100)
+        if user == post.user:
+                return 0
+        else:
+                for sub in post.sub_comments:
+                        if user == sub.user:
+                                return sub.profile_picture
+        return number
 
 def clean(value):
 	result = ''
@@ -180,7 +194,8 @@ def build_posts_json(posts):
 		result += '"mine":"' + str(post.mine) + '",'
 		result += '"vote_count":"' + str(post.vote_count) + '",'
 		result += '"up_voted":"' + str(post.up_voted) + '",'
-		result += '"down_voted":"' + str(post.down_voted) + '"}'
+		result += '"down_voted":"' + str(post.down_voted) + '",'
+		result += '"image":"' + str(post.profile_picture) + '"}'
   	result += ']'
   	complete = '{"posts":' + result + '}'
 	return complete
@@ -199,7 +214,8 @@ def build_sub_posts_json(post):
 		result += '"mine":"' + str(sub.mine) + '",'
 		result += '"vote_count":"' + str(sub.vote_count) + '",'
 		result += '"up_voted":"' + str(sub.up_voted) + '",'
-		result += '"down_voted":"' + str(sub.down_voted) + '"}'
+		result += '"down_voted":"' + str(sub.down_voted) + '",'
+		result += '"image":"' + str( sub.profile_picture ) + '"}'
   	result += ']'
   	return result;
 
@@ -208,6 +224,7 @@ def create_post(user,text):
 	post.user = user
 	post.text = text
 	post.time_created = int(time.time() * 1000)
+	post.profile_picture = 0;
 	post.put()
 	memcache.delete('posts')
 	memcache.set(post.key.urlsafe(), post, namespace='post')

@@ -75,7 +75,7 @@ class SubPostHandler(webapp2.RequestHandler):
 			id = self.request.get('id')
 			text = self.request.get('reply')
 			post = models.get_post(id)
-			post.create_sub(email,text)
+			post.create_sub( email, text )
 		self.redirect('/')
 
 class PostHandler(webapp2.RequestHandler):
