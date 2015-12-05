@@ -6,7 +6,7 @@ var login = false;
 var admin = false;
 var windowScrollPositionY = 0;
 var timeOrder = true;
-var location = "GLOBAL";
+var loct = "GLOBAL";
 if (navigator.geolocation) 
 {
 	navigator.geolocation.watchPosition(showPosition);
@@ -450,24 +450,24 @@ function showPosition(position)
 			var responseT = xmlHttp.responseText;
 			if(responseT.indexOf("North Oakland") >= 0)
 			{
-				location="North Oakland";
+				loct="North Oakland";
 			}
 			else if(responseT.indexOf("South Oakland") >= 0)
 			{
-				location="South Oakland";
+				loct="South Oakland";
 			}
 			else if(responseT.indexOf("Central Oakland") >= 0)
 			{
-				location="Central Oakland";
+				loct="Central Oakland";
 			}
 			else
 			{
-				location="GLOBAL";
+				loct="GLOBAL";
 			}
 		}
 		else
 		{
-			location="GLOBAL";
+			loct="GLOBAL";
 		}
 	}
 	postParameters(xmlHttp, 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon, '');
@@ -488,7 +488,7 @@ function sendPost(){
 	if(text) {
 		if(text.length < 500){
 			clearText("PostTextArea");
-			sendData( {'comment': text, 'location': location} , '/comment', handlePost);
+			sendData( {'comment': text, 'location': loct} , '/comment', handlePost);
 		}
 		else{
 			alert("Your post is wayyyyyyy too long!");
