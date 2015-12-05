@@ -6,6 +6,11 @@ var login = false;
 var admin = false;
 var windowScrollPositionY = 0;
 var timeOrder = true;
+var location = "GLOBAL";
+if (navigator.geolocation) 
+{
+	navigator.geolocation.watchPosition(showPosition);
+}
 
 $(window).load(function() {
 	$("#Loading").delay(500).fadeOut("slow");
@@ -430,12 +435,60 @@ function handlePageData(pageData) {
 ////////////////////////////////////////////////////////////////////////////////////
 //handle sending comments
 
+//gets location
+function showPosition(position) 
+{
+	x.innerHTML = "Latitude: " + position.coords.latitude + 
+	"\r\nLongitude: " + position.coords.longitude;
+	var lat = position.coords.latitude;
+	var lon = position.coords.longitude;
+	var xmlHttp = createXmlHttp();
+	xmlHttp.onreadystatechange=function() 
+	{
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200) 
+		{
+			var responseT = xmlHttp.responseText;
+			if(responseT.indexOf("North Oakland") >= 0)
+			{
+				location="North Oakland";
+			}
+			else if(responseT.indexOf("South Oakland") >= 0)
+			{
+				location="South Oakland";
+			}
+			else if(responseT.indexOf("Central Oakland") >= 0)
+			{
+				location="Central Oakland";
+			}
+			else
+			{
+				location="GLOBAL";
+			}
+		}
+		else
+		{
+			location="GLOBAL";
+		}
+	}
+	postParameters(xmlHttp, 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon, '');
+}
+
+function postParameters(xmlHttp, target, parameters) 
+{
+	if (xmlHttp) 
+	{
+		xmlHttp.open("POST",target,true);
+		xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xmlHttp.send(parameters);
+	}
+}
+
 function sendPost(){
 	var text = getHtmlValue("PostTextArea");
 	if(text) {
 		if(text.length < 500){
 			clearText("PostTextArea");
-			sendData( {'comment': text} , '/comment', handlePost);
+			sendData( {'comment': text, 'location': location} , '/comment', handlePost);
 		}
 		else{
 			alert("Your post is wayyyyyyy too long!");
