@@ -438,8 +438,6 @@ function handlePageData(pageData) {
 //gets location
 function showPosition(position) 
 {
-	x.innerHTML = "Latitude: " + position.coords.latitude + 
-	"\r\nLongitude: " + position.coords.longitude;
 	var lat = position.coords.latitude;
 	var lon = position.coords.longitude;
 	var xmlHttp = createXmlHttp();
