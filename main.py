@@ -83,7 +83,8 @@ class PostHandler(webapp2.RequestHandler):
 		email = get_user_email()
 		if email:
 			text = self.request.get('comment')
-			models.create_post(email,text)
+			location = self.request.get('location')
+			models.create_post(email,text,location)
 		self.redirect('/')
 
 class MapHandler(webapp2.RequestHandler):
