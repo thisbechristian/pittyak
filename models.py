@@ -11,6 +11,7 @@ class Post(ndb.Model):
 	text = ndb.TextProperty()
 	time_created = ndb.IntegerProperty()
         profile_picture = ndb.IntegerProperty()
+        location = ndb.StringProperty()
 	
 	def add_up_vote(self, user):
 		self.remove_down_vote(user)
@@ -226,10 +227,11 @@ def build_sub_posts_json(post):
   	result += ']'
   	return result;
 
-def create_post(user,text):
+def create_post(user,text, location):
 	post = Post(parent=get_post_ancestor())
 	post.user = user
 	post.text = text
+	post.location = location
 	post.time_created = int(time.time() * 1000)
 	post.profile_picture = 0;
 	post.put()
