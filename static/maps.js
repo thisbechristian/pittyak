@@ -14,8 +14,18 @@ function initMap() {
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: pos,
-		zoom: 16
+		zoom: 16,
+		disableDefaultUI: true
 	});
+	
+	mapOptions = {
+    	draggable: false,
+        scrollwheel: false,
+        disableDoubleClickZoom: false,
+        zoomControl: false
+    };
+    
+    map.setOptions(mapOptions);
 	 
 	if (navigator.geolocation && !locationSet) {
 		navigator.geolocation.getCurrentPosition(
