@@ -288,6 +288,7 @@ function filterByLocation(location){
 
 function filterForUser(){
 	user_filter = true;
+	location_filter = "GLOBAL";
 	repositionMap();
 	sendData( {'user': user_filter} , '/me', handlePost);
 }
