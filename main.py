@@ -49,7 +49,17 @@ class GetPostHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
 		if email:
-			self.response.out.write(models.get_posts_as_json(email))
+			location = self.request.get('location')
+			self.response.out.write(models.get_posts_as_json(email,location))
+
+class LocationHandler(webapp2.RequestHandler):
+	def post(self):
+		self.get()
+		
+	def get(self):
+		email = get_user_email()
+		if email:
+			models.clear_memcache()
 
 class ContactHandler(webapp2.RequestHandler):
 	def post(self):
@@ -128,6 +138,7 @@ mappings = [
 	('/', MainPageHandler),
 	('/comments', GetPostHandler),
 	('/reply', SubPostHandler),
+	('/location', LocationHandler),
 	('/comment', PostHandler),
 	('/contact', ContactHandler),
 	('/vote', VoteHandler),

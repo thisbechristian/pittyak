@@ -19,6 +19,13 @@ indexes:
 - kind: Post
   ancestor: yes
   properties:
+  - name: location
+  - name: time_created
+    direction: desc
+
+- kind: Post
+  ancestor: yes
+  properties:
   - name: time_created
     direction: desc
 

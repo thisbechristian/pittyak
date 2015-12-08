@@ -30,24 +30,31 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a id="logo" href="/"><img width="160" height="75" src="/pictures/pittyak_logo.png"> </img></a>
+				<a id="logo" href="/" onclick='filterByLocation("GLOBAL");'><img width="160" height="75" src="/pictures/pittyak_logo.png"> </img></a>
 			</div>
 			<div class="collapse navbar-collapse" id="myNavBar" background="ffffff">
 				<ul class="nav navbar-nav">
+					{% if user_email %}
+					<li class=""><a href="#" onclick='filterByLocation("North Oakland");'> <span class="glyphicon glyphicon-chevron-up"></span> North Oakland</a></li>
+					<li class=""><a href="#" onclick='filterByLocation("Central Oakland");'><span class="glyphicon glyphicon-chevron-right"></span> Central Oakland</a></li>
+					<li class=""><a href="#" onclick='filterByLocation("South Oakland");'><span class="glyphicon glyphicon-chevron-down"></span> South Oakland</a></li>
+					<li class=""><a href="#" onclick='filterByLocation("GLOBAL");'><span class="glyphicon glyphicon-globe"></span> Global</a></li>
+					<li><a href=""><span class="glyphicon glyphicon-user"></span> Me</a></li> 
+					{% endif %}
+<!-- 
 					<li class=""><a href="/maps?lat=40.446851&lng=-79.954787"> <span class="glyphicon glyphicon-chevron-up"></span> North Oakland</a></li>
 					<li class=""><a href="/maps?lat=40.438695&lng=-79.951710"><span class="glyphicon glyphicon-chevron-right"></span> Central Oakland</a></li>
 					<li class=""><a href="/maps?lat=40.438344&lng=-79.957729"><span class="glyphicon glyphicon-chevron-down"></span> South Oakland</a></li>
-					<!--<li class=""><a href="/maps?lat=40.442249&lng=-79.956126"><span class="glyphicon glyphicon-book"></span> Campus</a></li> -->
-					<li class=""><a href="/maps"><span class="glyphicon glyphicon-globe"></span> Global</a></li>
+					<li class=""><a href="/maps?lat=40.442249&lng=-79.956126"><span class="glyphicon glyphicon-book"></span> Campus</a></li>
+ -->
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class=""><a href="#" data-toggle="modal" data-target="#AboutModal"> <span class="glyphicon glyphicon-question-sign"></span> About</a></li>
-					{% if user_email %} <li class=""><a href="#" data-toggle="modal" data-target="#ContactModal"> <span class="glyphicon glyphicon-envelope"></span> Contact</a></li> {% endif %}
-					{% if not user_email %}<li><a href="https://accounts.google.com/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li> {% endif %}
-
 					{% if user_email %}
+					<li class=""><a href="#" data-toggle="modal" data-target="#ContactModal"> <span class="glyphicon glyphicon-envelope"></span> Contact</a></li>
 					<li><a href="{{ logout_url }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 					{% else %}
+					<li><a href="https://accounts.google.com/signup"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li> 
 					<li><a href="{{ login_url }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
 					{% endif %}
 				</ul>
@@ -65,7 +72,11 @@
 				</div>
 				
 				<div class="modal-body" style="text-align:justify">
-					<p><em>Pitt Yak</em> is the best application known to man.</p>
+					<p>
+						<strong>Pitt Yak</strong> is an application built by four students (Christian Boni, Joesph McClain, Philip Washy, & Matthew O'Brien) at the University of Pittsburgh for the Programming for Web Applications course taught by Timothy James. 
+						The idea behind this social media project is to allow students at the University of Pittsburgh's main campus to anonymously post their thoughts. Additionally, we allow these students posts
+						to be categorized by 1 of 4 locations. The posts can be filtered by North, Central, and South Oakland as well as Globally for users who are not on campus at the moment.
+					</p>
 				</div>
 			</div>
 		</div>

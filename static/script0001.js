@@ -7,6 +7,7 @@ var admin = false;
 var windowScrollPositionY = 0;
 var timeOrder = true;
 var loct = "GLOBAL";
+var location_filter = "GLOBAL";
 if (navigator.geolocation) 
 {
 	navigator.geolocation.watchPosition(showPosition);
@@ -258,7 +259,7 @@ function convertSubPostToHtml(post) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-//sort comments
+//sort / filter comments
 
 function toggleSort(time){
 	if(time && !timeOrder){
@@ -275,6 +276,11 @@ function swap(array, i0, i1) {
 	var temp = array[i0];
 	array[i0] = array[i1];
 	array[i1] = temp;
+}
+
+function filterByLocation(location){
+	location_filter = location;
+	sendData( {'location': location} , '/location', handlePost);
 }
 
 function getSortedPosts() {
@@ -390,7 +396,7 @@ function showSubPostArea(key){
 }
 
 function loadPosts(){
-	sendData({'since':lastPost}, '/comments', handlePosts);
+	sendData({'since':lastPost, 'location':location_filter}, '/comments', handlePosts);
 }
 
 function handlePosts(xmlHttp, params) {
@@ -401,6 +407,7 @@ function handlePosts(xmlHttp, params) {
 function handlePageData(pageData) {
 	if (pageData) {
 		if (pageData.posts) {
+			posts = new Object();
   			var first = true;
   			for (var i = 0; i < pageData.posts.length; i++) {
 				var p = pageData.posts[i];
@@ -425,7 +432,7 @@ function handlePageData(pageData) {
  				}
  				posts[p.key] = p;
  			}
-			loadPostArea();
+ 			loadPostArea();
 		}
 	}
 }
