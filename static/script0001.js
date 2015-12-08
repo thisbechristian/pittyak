@@ -1,13 +1,13 @@
 var posts = new Object();
-var filtered = new Object();
 var lastLoad = 0;
 var lastPost = 0;
 var login = false;
 var admin = false;
-var windowScrollPositionY = 0;
 var timeOrder = true;
 var loct = "GLOBAL";
 var location_filter = "GLOBAL";
+var user_filter = false;
+
 if (navigator.geolocation) 
 {
 	navigator.geolocation.watchPosition(showPosition);
@@ -279,8 +279,41 @@ function swap(array, i0, i1) {
 }
 
 function filterByLocation(location){
+	//reset user post filter
+	user_filter = false;
 	location_filter = location;
+	repositionMap();
 	sendData( {'location': location} , '/location', handlePost);
+}
+
+function filterForUser(){
+	user_filter = true;
+	repositionMap();
+	sendData( {'user': user_filter} , '/me', handlePost);
+}
+
+function repositionMap(){
+	//re-position map
+	if(location_filter === "North Oakland"){
+		setHtml('lat', '40.4508487');
+		setHtml('lng', '-79.9637237');
+	}
+	
+	else if(location_filter === "Central Oakland"){
+		setHtml('lat', '40.4385189');
+		setHtml('lng', '-79.9579115');
+	}
+	
+	else if(location_filter === "South Oakland"){
+		setHtml('lat', '40.433010');
+		setHtml('lng', '-79.958449');
+	}
+	
+	else{
+		setHtml('lat', 'none');
+		setHtml('lng', 'none');
+	}
+	initMap();
 }
 
 function getSortedPosts() {
@@ -396,7 +429,7 @@ function showSubPostArea(key){
 }
 
 function loadPosts(){
-	sendData({'since':lastPost, 'location':location_filter}, '/comments', handlePosts);
+	sendData({'since':lastPost, 'location':location_filter, 'user':user_filter }, '/comments', handlePosts);
 }
 
 function handlePosts(xmlHttp, params) {

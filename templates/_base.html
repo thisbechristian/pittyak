@@ -19,8 +19,12 @@
 	<body>
 	
 	<div class="thebackground">
-		<img src="/pictures/cathy.jpg"></img>
+<!-- 	<img src="/pictures/cathy.jpg"></img>	-->
+		<div id="map"></div>
 	</div>
+	
+	<p hidden id='lat'></p>
+	<p hidden id='lng'></p>
 
 	<nav class="navbar navbar-default" id="theNavBar">
 		<div class="container-fluid">
@@ -39,7 +43,7 @@
 					<li class=""><a href="#" onclick='filterByLocation("Central Oakland");'><span class="glyphicon glyphicon-chevron-right"></span> Central Oakland</a></li>
 					<li class=""><a href="#" onclick='filterByLocation("South Oakland");'><span class="glyphicon glyphicon-chevron-down"></span> South Oakland</a></li>
 					<li class=""><a href="#" onclick='filterByLocation("GLOBAL");'><span class="glyphicon glyphicon-globe"></span> Global</a></li>
-					<li><a href=""><span class="glyphicon glyphicon-user"></span> Me</a></li> 
+					<li class=""><a href="#" onclick='filterForUser();'><span class="glyphicon glyphicon-user"></span> Me</a></li> 
 					{% endif %}
 <!-- 
 					<li class=""><a href="/maps?lat=40.446851&lng=-79.954787"> <span class="glyphicon glyphicon-chevron-up"></span> North Oakland</a></li>

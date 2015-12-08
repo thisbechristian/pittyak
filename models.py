@@ -167,8 +167,8 @@ def clean(value):
 				result += c
 	return result
 
-def get_posts_as_json(email, location):
-	posts = get_posts(location)
+def get_posts_as_json(email, location, user):
+	posts = get_posts(email, location, user)
 	for post in posts:
 		post.vote_count = post.count_votes()
 		post.sub_comments = post.get_subs()
@@ -257,16 +257,17 @@ def get_post(post_id):
 		memcache.set(result.key.urlsafe(), result, namespace='post')
 	return result
 	
-def get_posts(location):
+def get_posts(email, location, user):
 	result = memcache.get('posts')
 	if (not result):
 		result = list()
 		q = Post.query(ancestor=get_post_ancestor())
 		q = q.order(-Post.time_created)
-		if(location != "GLOBAL"):
+		if(user):
+			q = q.filter(Post.user == email)
+		elif(location != "GLOBAL"):
 			q = q.filter(Post.location == location)
 		for post in q.fetch(500):
-			print post
 			result.append(post)
 		memcache.set('posts',result)
 	return result

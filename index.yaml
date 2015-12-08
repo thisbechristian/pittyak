@@ -29,6 +29,13 @@ indexes:
   - name: time_created
     direction: desc
 
+- kind: Post
+  ancestor: yes
+  properties:
+  - name: user
+  - name: time_created
+    direction: desc
+
 - kind: PostSub
   ancestor: yes
   properties:

@@ -6,35 +6,47 @@ function initMap() {
 	var locationSet = !isNaN(lat) && !isNaN(lng);
 
 	if(!locationSet){
-		lat = 40.442014;
-		lng = -79.962552;
-	}
-
-	map = new google.maps.Map(document.getElementById('map'), {
-    	center: {lat: lat, lng: lng},
-    	zoom: 15
-    });
-	 
-	 if (navigator.geolocation && !locationSet) {
-	 	infoWindow = new google.maps.InfoWindow({map: map});
-		navigator.geolocation.getCurrentPosition(function(position) {
-		  var pos = {
-			lat: position.coords.latitude,
-			lng: position.coords.longitude
-		  };
-		  infoWindow.setPosition(pos);
-		  infoWindow.setContent('There you are!');
-		  map.setCenter(pos);
-		});
+		lat = 40.444322;
+		lng = -79.9609691;
 	}
 	
-	else if(locationSet){
-		var pos = {
-			lat: lat,
-			lng: lng
-		};
-		infoWindow = new google.maps.InfoWindow({map: map});
-		infoWindow.setPosition(pos);
-		infoWindow.setContent('See whats going on!');
+	var pos = {lat: lat, lng: lng};
+
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: pos,
+		zoom: 16
+	});
+	 
+	if (navigator.geolocation && !locationSet) {
+		navigator.geolocation.getCurrentPosition(
+		function(position) {
+			var tracked = {
+				lat: position.coords.latitude,
+				lng: position.coords.longitude
+		  	};
+		  	map.setCenter(tracked);
+		  	var marker = new google.maps.Marker({
+				position: tracked,
+				map: map,
+				title: ''
+			});
+		},
+		function(error) {
+            console.log(error);
+        },
+		{
+            maximumAge:60000,
+            timeout:5000,
+            enableHighAccuracy:false
+        });
 	}
+
+	else{
+		var marker = new google.maps.Marker({
+			position: pos,
+			map: map,
+			title: ''
+		});
+  	}
+	
 }
