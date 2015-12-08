@@ -138,6 +138,7 @@ def generate_sub_number(post, user):  ##make sure there is only one picture per 
                 search = True
                 while search:
                         search = False
+                        post.sub_comments = post.get_subs()
                         for sub in post.sub_comments:
                                 if user == sub.user:    ##return the number already assigned to the user if they have posted in the thread before
                                         return sub.profile_picture
