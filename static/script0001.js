@@ -173,7 +173,8 @@ function convertPostToHtml(post) {
 	text += '<div id="post" class="col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1">';
 	text += '<div class="row">';
 	text += '<div class="col-sm-11 col-xs-10">';
-	text += '<p>' + post.text + '</p><br><br>';
+	text += '<p><img src="' + post.image + '" alt="H2P!" style="width:50px;height:50px;">  ';
+	text += post.text + '</p><br><br>';
 	text += '<p id="postdate">' + getRelativeTime(post.time) + '</p><br>';
 	text +=	'<a href="#" data-toggle="modal" data-target="#ReplyModal" data-post="' + post.key + '">';
 	text +=	'<p class="glyphicon glyphicon-share-alt"></p>';
@@ -223,7 +224,8 @@ function convertSubPostToHtml(post) {
 	text += '<div id="post" class="col-sm-6 col-sm-offset-4 col-xs-9 col-xs-offset-2">';
 	text += '<div class="row">';
 	text += '<div class="col-sm-11 col-xs-10">';
-	text += '<p>' + post.text + '</p><br><br>';
+	text += '<p><img src="' + post.image + '" alt="H2P!" style="width:50px;height:50px;">  ';
+	text += post.text + '</p><br><br>';
 	text += '<p id="postdate">' + getRelativeTime(post.time) + '</p><br>';
 	if (admin || post.mine) {	
 		text += '<a href="delete?id=' + post.key + '">';

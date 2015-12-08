@@ -138,8 +138,8 @@ def generate_sub_number(post, user):  ##make sure there is only one picture per 
                 search = True
                 while search:
                         search = False
-                        post.sub_comments = post.get_subs()
-                        for sub in post.sub_comments:
+                        sub_comments = post.get_subs()
+                        for sub in sub_comments:
                                 if user == sub.user:    ##return the number already assigned to the user if they have posted in the thread before
                                         return sub.profile_picture
                                 if sub.profile_picture == number:    ##else check if the number is already assigned to another user
@@ -204,7 +204,7 @@ def build_posts_json(posts):
 		result += '"vote_count":"' + str(post.vote_count) + '",'
 		result += '"up_voted":"' + str(post.up_voted) + '",'
 		result += '"down_voted":"' + str(post.down_voted) + '",'
-		result += '"image":"' + str(post.profile_picture) + '"}'
+		result += '"image":"/pictures/icons/' + str(post.profile_picture) + '.png"}'
   	result += ']'
   	complete = '{"posts":' + result + '}'
 	return complete
@@ -224,7 +224,7 @@ def build_sub_posts_json(post):
 		result += '"vote_count":"' + str(sub.vote_count) + '",'
 		result += '"up_voted":"' + str(sub.up_voted) + '",'
 		result += '"down_voted":"' + str(sub.down_voted) + '",'
-		result += '"image":"' + str( sub.profile_picture ) + '"}'
+		result += '"image":"/pictures/icons/' + str( sub.profile_picture ) + '.png"}'
   	result += ']'
   	return result;
   	
