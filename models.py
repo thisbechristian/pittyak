@@ -10,44 +10,114 @@ class Post(ndb.Model):
 	user = ndb.StringProperty()
 	text = ndb.TextProperty()
 	time_created = ndb.IntegerProperty()
-        profile_picture = ndb.IntegerProperty()
-        location = ndb.StringProperty()
+	profile_picture = ndb.IntegerProperty()
+	location = ndb.StringProperty()
 	
-	def add_up_vote(self, user):
-		self.remove_down_vote(user)
-		PostUpVote.get_or_insert(user, parent=self.key)
+	##########################################################
+	#add / change votes
+	def add_up_vote(self, user):	
+		if self.is_up_voted(user):
+			return
+		if self.is_down_voted(user):
+			self.change_vote(user, "up")
+			return
+		self.add_vote(user, "up")
 		
 	def add_down_vote(self, user):
-		self.remove_up_vote(user)
-		PostDownVote.get_or_insert(user, parent=self.key)
+		if self.is_down_voted(user):
+			return
+		if self.is_up_voted(user):
+			self.change_vote(user, "down")
+			return
+		self.add_vote(user, "down")	
+		
+	def add_vote(self, user, type):
+		id = str(self.key.urlsafe()) + str(user)
+		vote = PostVote(id=id, parent=self.key)
+		vote.user = user
+		vote.vote = type
+		vote.put()
+		self.add_vote_to_memcache(user,vote)
+	
+	def change_vote(self, user, type):
+		vote = self.get_vote(user)
+		vote.vote = type
+		vote.put()
+		self.add_vote_to_memcache(user,vote)	
+	
+	##########################################################	
+	#add/update the vote memcache
+		
+	def add_vote_to_memcache(self, user, vote):
+		key = self.key.urlsafe() + "votes"
+		votes = self.get_votes()
+		print user
+		if user in votes:
+			del votes[user]
+		votes[user] = vote
+		memcache.set(key, votes)
 
-	def remove_up_vote(self, user):
-		post_vote = PostUpVote.get_by_id(user, parent=self.key)
-		if post_vote:
-			post_vote.key.delete()
+	##########################################################
+	#get a vote or get all votes
+
+	def get_vote(self,user):
+		id = str(self.key.urlsafe()) + str(user)
+		result = None
+		votes = self.get_votes()
+		if votes and (user in votes):
+			result = votes[user]
+		else:
+			result = PostVote.get_by_id(id, parent=self.key)
+			self.add_vote_to_memcache(user, result)
+		return result
 			
-	def remove_down_vote(self, user):
-		post_vote = PostDownVote.get_by_id(user, parent=self.key)
-		if post_vote:
-			post_vote.key.delete()
+	def get_votes(self):
+		key = self.key.urlsafe() + "votes"
+		votes = memcache.get(key)
+		if not votes:
+			votes = dict()
+			vote_list = PostVote.query(ancestor=self.key)
+			for vote in vote_list:
+				votes[vote.user] = vote
+			memcache.set(key, votes)
+		return votes
+		
+	##########################################################
+	#count votes
 
 	def count_votes(self):
-		pos = PostUpVote.query(ancestor=self.key)
-		neg = PostDownVote.query(ancestor=self.key)
-		return (pos.count() - neg.count())
+		pos = 0
+		neg = 0
+		votes = self.get_votes().values()
+		print self.key.urlsafe()
+		for vote in votes:
+			if vote and vote.vote == "up":
+				pos = pos+1
+			elif vote and vote.vote == "down":
+				neg = neg+1
+		print (pos - neg)
+		return (pos - neg)
+	
+	##########################################################
+	#check if user up-voted or down-voted
 
 	def is_up_voted(self, user):
 		result = False
-		if PostUpVote.get_by_id(user, parent=self.key):
+		vote = self.get_vote(user)
+		if vote and vote.user == user and vote.vote == "up":
 			result = True
 		return result
 		
 	def is_down_voted(self, user):
 		result = False
-		if PostDownVote.get_by_id(user, parent=self.key):
+		vote = self.get_vote(user)
+		if vote and vote.user == user and vote.vote == "down":
 			result = True
 		return result
-
+		
+	##########################################################
+	#subposts
+	
 	def create_sub(self, user, text):
 		sub = PostSub(parent=self.key)
 		sub.user = user
@@ -70,19 +140,19 @@ class Post(ndb.Model):
 			memcache.set(self.key.urlsafe(), subposts)
 		return subposts
 
-	def count_subs(self):
-		q = PostSub.query(ancestor=self.key)
-		return q.count()
+# 	def count_subs(self):
+# 		q = PostSub.query(ancestor=self.key)
+# 		return q.count()
+		
+	##########################################################
 	
 	def delete_post(self):
 		delete_post_from_memcache(self.key.urlsafe());
 		self.key.delete()
 
-class PostUpVote(ndb.Model):
-	pass
-	
-class PostDownVote(ndb.Model):
-	pass
+class PostVote(ndb.Model):
+	user = ndb.StringProperty()
+	vote = ndb.StringProperty()
 
 class PostSub(ndb.Model):
 	user = ndb.StringProperty()
@@ -90,68 +160,133 @@ class PostSub(ndb.Model):
 	time_created = ndb.IntegerProperty()
 	profile_picture = ndb.IntegerProperty()
 	
-	def add_up_vote(self, user):
-		self.remove_down_vote(user)
-		SubPostUpVote.get_or_insert(user, parent=self.key)
+	##########################################################
+	#add / change votes
+	def add_up_vote(self, user):	
+		if self.is_up_voted(user):
+			return
+		if self.is_down_voted(user):
+			self.change_vote(user, "up")
+			return
+		self.add_vote(user, "up")
 		
 	def add_down_vote(self, user):
-		self.remove_up_vote(user)
-		SubPostDownVote.get_or_insert(user, parent=self.key)
+		if self.is_down_voted(user):
+			return
+		if self.is_up_voted(user):
+			self.change_vote(user, "down")
+			return
+		self.add_vote(user, "down")	
+		
+	def add_vote(self, user, type):
+		id = str(self.key.urlsafe()) + str(user)
+		vote = SubPostVote(id=id, parent=self.key)
+		vote.user = user
+		vote.vote = type
+		vote.put()
+		self.add_vote_to_memcache(user,vote)
+	
+	def change_vote(self, user, type):
+		vote = self.get_vote(user)
+		vote.vote = type
+		vote.put()
+		self.add_vote_to_memcache(user,vote)	
+	
+	##########################################################	
+	#add/update the vote memcache
+		
+	def add_vote_to_memcache(self, user, vote):
+		key = self.key.urlsafe() + "votes"
+		votes = self.get_votes()
+		print user
+		if user in votes:
+			del votes[user]
+		votes[user] = vote
+		memcache.set(key, votes)
 
-	def remove_up_vote(self, user):
-		post_vote = SubPostUpVote.get_by_id(user, parent=self.key)
-		if post_vote:
-			post_vote.key.delete()
+	##########################################################
+	#get a vote or get all votes
+
+	def get_vote(self,user):
+		id = str(self.key.urlsafe()) + str(user)
+		result = None
+		votes = self.get_votes()
+		if votes and (user in votes):
+			result = votes[user]
+		else:
+			result = SubPostVote.get_by_id(id, parent=self.key)
+			self.add_vote_to_memcache(user, result)
+		return result
 			
-	def remove_down_vote(self, user):
-		post_vote = SubPostDownVote.get_by_id(user, parent=self.key)
-		if post_vote:
-			post_vote.key.delete()
+	def get_votes(self):
+		key = self.key.urlsafe() + "votes"
+		votes = memcache.get(key)
+		if not votes:
+			votes = dict()
+			vote_list = SubPostVote.query(ancestor=self.key)
+			for vote in vote_list:
+				votes[vote.user] = vote
+			memcache.set(key, votes)
+		return votes
+		
+	##########################################################
+	#count votes
 
 	def count_votes(self):
-		pos = SubPostUpVote.query(ancestor=self.key)
-		neg = SubPostDownVote.query(ancestor=self.key)
-		return (pos.count() - neg.count())
+		pos = 0
+		neg = 0
+		votes = self.get_votes().values()
+		for vote in votes:
+			if vote and vote.vote == "up":
+				pos = pos+1
+			elif vote and vote.vote == "down":
+				neg = neg+1
+		return (pos - neg)
+	
+	##########################################################
+	#check if user up-voted or down-voted
 
 	def is_up_voted(self, user):
 		result = False
-		if SubPostUpVote.get_by_id(user, parent=self.key):
+		vote = self.get_vote(user)
+		if vote and vote.user == user and vote.vote == "up":
 			result = True
 		return result
 		
 	def is_down_voted(self, user):
 		result = False
-		if SubPostDownVote.get_by_id(user, parent=self.key):
+		vote = self.get_vote(user)
+		if vote and vote.user == user and vote.vote == "down":
 			result = True
 		return result
+		
+	##########################################################
 	
 	def delete_post(self):
 		delete_subpost_from_post_memcache(self, self.key.parent().urlsafe());
 		self.key.delete()
 		
-class SubPostUpVote(ndb.Model):
-	pass
-	
-class SubPostDownVote(ndb.Model):
-	pass
+class SubPostVote(ndb.Model):
+	user = ndb.StringProperty()
+	vote = ndb.StringProperty()
 
 def generate_sub_number(post, user):  ##make sure there is only one picture per user
-        if user == post.user: ##check if user is OP
-                return 0
-        else:
-                number = randint(1,100) ##generate a random number
-                search = True
-                while search:
-                        search = False
-                        sub_comments = post.get_subs()
-                        for sub in sub_comments:
-                                if user == sub.user:    ##return the number already assigned to the user if they have posted in the thread before
-                                        return sub.profile_picture
-                                if sub.profile_picture == number:    ##else check if the number is already assigned to another user
-                                        search = True
-                                        number = randint(1,100)
-                                        break
-                return number
+	if user == post.user: ##check if user is OP
+		return 0
+	else:
+		number = randint(1,100) ##generate a random number
+		search = True
+		while search:
+			search = False
+			sub_comments = post.get_subs()
+			for sub in sub_comments:
+				if user == sub.user:    ##return the number already assigned to the user if they have posted in the thread before
+					return sub.profile_picture
+				if sub.profile_picture == number:    ##else check if the number is already assigned to another user
+					search = True
+					number = randint(1,100)
+					break
+		return number
 
 def clean(value):
 	result = ''
