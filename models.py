@@ -244,7 +244,7 @@ def create_post(user,text,location):
 	add_post_to_memcache(post.key.urlsafe(), post)
 
 def clear_memcache():
-	memcache.delete('posts')
+	memcache.flush_all()
 	
 def delete_post_from_memcache(id):
 	posts = memcache.get('posts')
@@ -296,23 +296,23 @@ def delete_post(post):
 def get_post(post_id):
 	result = None
 	posts = memcache.get('posts')
-	if not posts:
+	if posts and (post_id in posts):
+		result = posts[post_id]
+	else:
 		result = ndb.Key(urlsafe=post_id).get()
 		add_post_to_memcache(result.key.urlsafe(), result)
-	else:
-		result = posts[post_id]
 	return result
 	
 def get_subpost(subpost_id):
 	result = None
 	subposts = memcache.get('subposts')
-	if not subposts:
+	if subposts and (subpost_id in subposts):
+		result = subposts[subpost_id]
+	else:
 		result = ndb.Key(urlsafe=subpost_id).get()
 		add_subpost_to_memcache(result.key.urlsafe(), result)
-	else:
-		result = subposts[subpost_id]
 	return result
-	
+
 def get_filtered_posts(posts, email, location, user):
 	if(user):
 		filtered = list()
