@@ -182,14 +182,14 @@ function convertPostToHtml(post) {
 		text +=	'<a class="glyphicon glyphicon-sort-by-attributes-alt" onclick="toggleSubPostArea(\'' + post.key + '\')"></a>&nbsp&nbsp&nbsp';
 	}
 	if (admin || post.mine) {	
-		text += '<a href="delete?id=' + post.key + '">';
+		text += '<a href="delete?id=' + post.key + '&type=post">';
 		text += '<p class="glyphicon glyphicon-trash"></p>';	
 		text += '</a>';
 	}
 	text += '</div>';
 	text += '<div id="votes" class="col-xs-1">';
 	if (login){
-		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'up\')">';
+		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'up\',\'post\')">';
 		if (post.up_voted){
 			text += '<p id ="postupvoted_' + post.key + '" class="glyphicon glyphicon-thumbs-up" style="color:green"></p>';
 		}
@@ -198,7 +198,7 @@ function convertPostToHtml(post) {
 		}
 		text += '</a>';
 		text += '<p id="votecount_' + post.key +'">' + post.vote_count + '</p>';
-		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'down\')">';
+		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'down\',\'post\')">';
 		if (post.down_voted){
 			text += '<p id ="postdownvoted_' + post.key + '" class="glyphicon glyphicon-thumbs-down" style="color:red"></p>';
 		}
@@ -227,14 +227,14 @@ function convertSubPostToHtml(post) {
 	text += post.text + '</p><br><br>';
 	text += '<p id="postdate">' + getRelativeTime(post.time) + '</p><br>';
 	if (admin || post.mine) {	
-		text += '<a href="delete?id=' + post.key + '">';
+		text += '<a href="delete?id=' + post.key + '&type=subpost">';
 		text += '<p class="glyphicon glyphicon-trash"> </p>';	
 		text += '</a>';
 	}
 	text += '</div>';
 	text += '<div id="votes" class="col-xs-1">';
 	if (login){
-		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'up\')">';
+		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'up\',\'subpost\')">';
 		if (post.up_voted){
 			text += '<p id ="postupvoted_' + post.key + '" class="glyphicon glyphicon-thumbs-up" style="color:green"></p>';
 		}
@@ -243,7 +243,7 @@ function convertSubPostToHtml(post) {
 		}
 		text += '</a>';
 		text += '<p id="votecount_' + post.key +'">' + post.vote_count + '</p>';
-		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'down\')">';
+		text += '<a id="vote" onclick="updateVote(\'' + post.key + '\',\'down\',\'subpost\')">';
 		if (post.down_voted){
 			text += '<p id ="postdownvoted_' + post.key + '" class="glyphicon glyphicon-thumbs-down" style="color:red"></p>';
 		}
@@ -284,14 +284,16 @@ function filterByLocation(location){
 	user_filter = false;
 	location_filter = location;
 	repositionMap();
-	sendData( {'location': location} , '/location', handlePost);
+	handlePost();
+	//sendData({'location': location} , '/location', handlePost);
 }
 
 function filterForUser(){
 	user_filter = true;
 	location_filter = "GLOBAL";
 	repositionMap();
-	sendData( {'user': user_filter} , '/me', handlePost);
+	handlePost();
+	//sendData( {'user': user_filter} , '/me', handlePost);
 }
 
 function repositionMap(){
@@ -565,10 +567,11 @@ function handleSubPost(xmlHttp, params) {
 
 ////////////////////////////////////////////////////////////////////////////////////
 //handle up/down votes
-function updateVote(id,vote){
+function updateVote(id,vote,type){
 	var params = {
 		'id': id,
-		'vote': vote
+		'vote': vote,
+		'type': type
 	};
 	sendData(params, "/vote", handleVote);
 }	

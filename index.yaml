@@ -40,4 +40,9 @@ indexes:
   ancestor: yes
   properties:
   - name: time_created
+
+- kind: PostSub
+  ancestor: yes
+  properties:
+  - name: time_created
     direction: desc

@@ -26,6 +26,12 @@ def get_user_email():
 	if user:
 		result = user.email()
 	return result
+	
+def get_post(type, id):
+	if(type == 'subpost'):
+		return models.get_subpost(id)
+	else:
+		return models.get_post(id)
 
 class MainPageHandler(webapp2.RequestHandler):
 	def get(self):
@@ -60,7 +66,7 @@ class LocationHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
 		if email:
-			models.clear_memcache()
+			pass
 
 class UserHandler(webapp2.RequestHandler):
 	def post(self):
@@ -69,7 +75,7 @@ class UserHandler(webapp2.RequestHandler):
 	def get(self):
 		email = get_user_email()
 		if email:
-			models.clear_memcache()
+			pass
 
 class ContactHandler(webapp2.RequestHandler):
 	def post(self):
@@ -94,7 +100,7 @@ class SubPostHandler(webapp2.RequestHandler):
 		if email:
 			id = self.request.get('id')
 			text = self.request.get('reply')
-			post = models.get_post(id)
+			post = get_post('post',id)
 			post.create_sub( email, text )
 		self.redirect('/')
 
@@ -127,7 +133,8 @@ class VoteHandler(webapp2.RequestHandler):
 		if email:
 			vote = self.request.get("vote")
 			id = self.request.get("id")
-			post = models.get_post(id)
+			type = self.request.get("type")
+			post = get_post(type, id)
 			if(vote == 'up'):
 				post.add_up_vote(email)
 			elif(vote == 'down'):
@@ -140,7 +147,8 @@ class VoteHandler(webapp2.RequestHandler):
 class DeletePostHandler(webapp2.RequestHandler):
 	def get(self):
 		id = self.request.get("id")
-		post = models.get_post(id)
+		type = self.request.get("type")
+		post = get_post(type, id)
 		models.delete_post(post)
 		self.redirect('/')
 

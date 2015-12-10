@@ -55,23 +55,28 @@ class Post(ndb.Model):
 		sub.time_created = int(time.time() * 1000)
 		sub.profile_picture = generate_sub_number(self, user)
 		sub.put()
+		add_subpost_to_memcache(sub.key.urlsafe(), sub)
+		add_subpost_to_post_memcache(sub, self.key.urlsafe())
 		return sub
 
 	def get_subs(self):
-		result = list()
-		q = PostSub.query(ancestor=self.key)
-		q = q.order(-PostSub.time_created)
-		for sub in q.fetch():
-			result.append(sub)
-		return result
+		subposts = memcache.get(self.key.urlsafe())
+		if not subposts:
+			subposts = list()
+			q = PostSub.query(ancestor=self.key)
+			q = q.order(PostSub.time_created)
+			for sub in q.fetch():
+				subposts.append(sub)
+			memcache.set(self.key.urlsafe(), subposts)
+		return subposts
 
 	def count_subs(self):
 		q = PostSub.query(ancestor=self.key)
 		return q.count()
 	
 	def delete_post(self):
+		delete_post_from_memcache(self.key.urlsafe());
 		self.key.delete()
-		memcache.delete('posts')
 
 class PostUpVote(ndb.Model):
 	pass
@@ -121,8 +126,8 @@ class PostSub(ndb.Model):
 		return result
 	
 	def delete_post(self):
+		delete_subpost_from_post_memcache(self, self.key.parent().urlsafe());
 		self.key.delete()
-		memcache.delete('posts')
 		
 class SubPostUpVote(ndb.Model):
 	pass
@@ -227,11 +232,8 @@ def build_sub_posts_json(post):
 		result += '"image":"/pictures/icons/' + str( sub.profile_picture ) + '.png"}'
   	result += ']'
   	return result;
-  	
-def clear_memcache():
-	memcache.delete('posts')
 
-def create_post(user,text, location):
+def create_post(user,text,location):
 	post = Post(parent=get_post_ancestor())
 	post.user = user
 	post.text = text
@@ -239,9 +241,50 @@ def create_post(user,text, location):
 	post.time_created = int(time.time() * 1000)
 	post.profile_picture = 0;
 	post.put()
-	clear_memcache()
-	memcache.set(post.key.urlsafe(), post, namespace='post')
+	add_post_to_memcache(post.key.urlsafe(), post)
+
+def clear_memcache():
+	memcache.delete('posts')
 	
+def delete_post_from_memcache(id):
+	posts = memcache.get('posts')
+	if posts:
+		del posts[id]
+		memcache.set('posts',posts)
+		
+def add_post_to_memcache(id, post):
+	posts = memcache.get('posts')
+	if not posts:
+		posts = dict()
+	posts[id] = post
+	memcache.set('posts',posts)
+		
+def delete_subpost_from_memcache(id):
+	subposts = memcache.get('subposts')
+	if subposts:
+		del subposts[id]
+		memcache.set('subposts',subposts)
+		
+def delete_subpost_from_post_memcache(subpost, parent_id):
+	subposts = memcache.get(parent_id)
+	if subposts:
+		del subposts[subposts.index(subpost)]
+		memcache.set(parent_id,subposts)
+		
+def add_subpost_to_memcache(id, subpost):
+	subposts = memcache.get('subposts')
+	if not subposts:
+		subposts = dict()
+	subposts[id] = subpost
+	memcache.set('subposts',subposts)
+
+def add_subpost_to_post_memcache(subpost, parent_id):
+	subs = memcache.get(parent_id)
+	if not subs:
+		subs = list()
+	subs.append(subpost)
+	memcache.set(parent_id,subs)
+
 def delete_post(post):
 	if(type(post) is Post):
 		post.sub_comments = post.get_subs()
@@ -251,26 +294,58 @@ def delete_post(post):
 	post.delete_post()
 
 def get_post(post_id):
-	result = memcache.get(post_id, namespace='post')
-	if not result:
+	result = None
+	posts = memcache.get('posts')
+	if not posts:
 		result = ndb.Key(urlsafe=post_id).get()
-		memcache.set(result.key.urlsafe(), result, namespace='post')
+		add_post_to_memcache(result.key.urlsafe(), result)
+	else:
+		result = posts[post_id]
 	return result
+	
+def get_subpost(subpost_id):
+	result = None
+	subposts = memcache.get('subposts')
+	if not subposts:
+		result = ndb.Key(urlsafe=subpost_id).get()
+		add_subpost_to_memcache(result.key.urlsafe(), result)
+	else:
+		result = subposts[subpost_id]
+	return result
+	
+def get_filtered_posts(posts, email, location, user):
+	if(user):
+		filtered = list()
+		for post in posts:
+			if post.user == email:
+				filtered.append(post)
+		return filtered
+	elif(location != "GLOBAL"):
+		filtered = list()
+		for post in posts:
+			if post.location == location:
+				filtered.append(post)
+		return filtered
+	else:
+		return posts
 	
 def get_posts(email, location, user):
 	result = memcache.get('posts')
 	if (not result):
-		result = list()
+		result = dict()
+		subposts = dict()
 		q = Post.query(ancestor=get_post_ancestor())
 		q = q.order(-Post.time_created)
-		if(user):
-			q = q.filter(Post.user == email)
-		elif(location != "GLOBAL"):
-			q = q.filter(Post.location == location)
 		for post in q.fetch(500):
-			result.append(post)
+			subs = list()
+			for subpost in post.get_subs():
+				subs.append(subpost)
+				subposts[subpost.key.urlsafe()] = subpost
+			memcache.set(post.key.urlsafe(), subs)
+			result[post.key.urlsafe()] = post
 		memcache.set('posts',result)
-	return result
+		memcache.set('subposts',subposts)
+	return get_filtered_posts(result.values(), email, location, user)
 
 def get_post_ancestor():
 	return ndb.Key('Posts', 'Ancestor') 
