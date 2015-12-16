@@ -1,1 +1,2 @@
-# CS-1520
+# Pitt-Yak
+# Oakland's Social Network
