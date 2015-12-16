@@ -1,0 +1,4 @@
+cron:
+- description: Refresh Cache
+  url: /cron/refresh
+  schedule: every 6 hours
