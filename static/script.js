@@ -26,6 +26,11 @@ function parseBoolean(string){
 	return (string.toLowerCase() === 'true');
 }
 
+function clearReply(){
+	clearText("ReplyTextArea");
+	$('#hemingway-reply').fadeOut("slow");
+}
+
 ////////////////////////////////////////////////////////////////////////////////////
 //Ajax core functionality
 
