@@ -1,6 +1,7 @@
 var map;
 var marker;
-var circles = {};
+var circle;
+var circleState;
 function initMap() {
 	var pos = {lat: latitude, lng: longitude};
 	map = new google.maps.Map(document.getElementById('map'), {
@@ -60,9 +61,11 @@ function changeLocation(lat, lng){
 	});
 }
 
-function postRadius(key, lat, lng){
+function postRadius(state, lat, lng){
 	var pos = {lat: lat, lng: lng};
-	var circle = new google.maps.Circle(
+	removeRadius();
+	circleState = state;
+	circle = new google.maps.Circle(
 		{
 			strokeColor: '#6699ff',
 			strokeOpacity: 0.55,
@@ -75,19 +78,12 @@ function postRadius(key, lat, lng){
 		
 		}
 	);
-	circles[key] = circle;
 	map.setCenter(pos);
 }
 
-function removeRadius(key){
-	var circle = circles[key];
+function removeRadius(){
 	if (circle){
+		setHtmlValue(circleState, "inactive");
 		circle.setMap(null);
-	}
-}
-
-function removeAllRadius(){
-	for (var key in circles) {
-		circles[key].setMap(null);
 	}
 }

@@ -124,8 +124,6 @@ function clearText(id) {
 function getRelativeTime(time) {
 	var result = 'more than a week ago';
 	var now = new Date().getTime();
-	console.log(now);
-	console.log(time);
 	var diff = (now - time) / 1000;
 	
 	if (diff < 60){
@@ -316,40 +314,6 @@ function filterForUser(){
 	//sendData( {'user': user_filter} , '/me', handlePost);
 }
 
-function repositionMap(){
-	//re-position map
-	if(location_filter === "North Oakland"){
-		changeLocation(40.4508487, -79.9637237);
-	}
-	
-	else if(location_filter === "Central Oakland"){
-		changeLocation(40.4385189, -79.9579115);
-	}
-	
-	else if(location_filter === "South Oakland"){
-		changeLocation(40.433010, -79.958449);
-	}
-	
-	else{
-		changeLocation(latitude, longitude);
-	}
-}
-
-function toggleLocation(key){
-	var state = 'location-'+key;
-	if(getHtmlValue(state) === "active"){
-		removeRadius(key);
-		repositionMap();
-		setHtmlValue(state, "inactive");
-	}
-	
-	else{
-		var lat = parseFloat(getHtmlValue('lat-'+key));
-		var lng = parseFloat(getHtmlValue('lng-'+key));
-		postRadius(key, lat, lng);
-		setHtmlValue(state, "active");
-	}
-}
 
 function getSortedPosts() {
 	var sortedPosts = new Array();
@@ -407,6 +371,78 @@ function getTopVoteSortedPosts() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
+// location services / manipulate the map
+
+//monitors current location
+function showPosition(position) 
+{
+	latitude = position.coords.latitude;
+	longitude = position.coords.longitude;
+	var xmlHttp = createXmlHttp();
+	xmlHttp.onreadystatechange=function() 
+	{
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200) 
+		{
+			var responseT = xmlHttp.responseText;
+			if(responseT.indexOf("North Oakland") >= 0)
+			{
+				loct="North Oakland";
+			}
+			else if(responseT.indexOf("South Oakland") >= 0)
+			{
+				loct="South Oakland";
+			}
+			else if(responseT.indexOf("Central Oakland") >= 0)
+			{
+				loct="Central Oakland";
+			}
+			else
+			{
+				loct="GLOBAL";
+			}
+		}
+		else
+		{
+			loct="GLOBAL";
+		}
+	}
+	postParameters(xmlHttp, 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latitude + ',' + longitude, '');
+}
+
+function repositionMap(){
+	//re-position map
+	if(location_filter === "North Oakland"){
+		changeLocation(40.4508487, -79.9637237);
+	}
+	
+	else if(location_filter === "Central Oakland"){
+		changeLocation(40.4385189, -79.9579115);
+	}
+	
+	else if(location_filter === "South Oakland"){
+		changeLocation(40.433010, -79.958449);
+	}
+	
+	else{
+		changeLocation(latitude, longitude);
+	}
+}
+
+function toggleLocation(key){
+	var state = 'location-'+key;
+	if(getHtmlValue(state) === "active"){
+		removeRadius();
+		repositionMap();
+		setHtmlValue(state, "inactive");
+	}
+	
+	else{
+		var lat = parseFloat(getHtmlValue('lat-'+key));
+		var lng = parseFloat(getHtmlValue('lng-'+key));
+		postRadius(state, lat, lng);
+		setHtmlValue(state, "active");
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////////
 //handle loading comments
@@ -488,8 +524,6 @@ function handlePageData(pageData) {
 				p.up_voted = parseBoolean(p.up_voted);
 				p.down_voted = parseBoolean(p.down_voted);
 				p.mine = parseBoolean(p.mine);
-				p.latitude = p.latitude;
-				p.longitude = p.longitude;
 				if (p.sub_comments) {
 					for (var j = 0; j < p.sub_comments.length; j++) {
 						var s = p.sub_comments[j];
@@ -511,42 +545,6 @@ function handlePageData(pageData) {
 
 ////////////////////////////////////////////////////////////////////////////////////
 //handle sending comments
-
-//gets location
-function showPosition(position) 
-{
-	latitude = position.coords.latitude;
-	longitude = position.coords.longitude;
-	var xmlHttp = createXmlHttp();
-	xmlHttp.onreadystatechange=function() 
-	{
-		if(xmlHttp.readyState == 4 && xmlHttp.status == 200) 
-		{
-			var responseT = xmlHttp.responseText;
-			if(responseT.indexOf("North Oakland") >= 0)
-			{
-				loct="North Oakland";
-			}
-			else if(responseT.indexOf("South Oakland") >= 0)
-			{
-				loct="South Oakland";
-			}
-			else if(responseT.indexOf("Central Oakland") >= 0)
-			{
-				loct="Central Oakland";
-			}
-			else
-			{
-				loct="GLOBAL";
-			}
-		}
-		else
-		{
-			loct="GLOBAL";
-		}
-	}
-	postParameters(xmlHttp, 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latitude + ',' + longitude, '');
-}
 
 function postParameters(xmlHttp, target, parameters) 
 {
@@ -629,7 +627,6 @@ function handleVote(xmlHttp, params){
 function loadLoop() {
 	var msSinceLast = (new Date().getTime() - lastLoad);
 	if (msSinceLast > 15*60000) {
-		removeAllRadius();
 		loadPosts();
 		lastLoad = new Date().getTime();
 	}

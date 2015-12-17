@@ -12,8 +12,8 @@ class Post(ndb.Model):
 	time_created = ndb.IntegerProperty()
 	profile_picture = ndb.IntegerProperty()
 	location = ndb.StringProperty()
-	latitude = ndb.StringProperty(default=40.444322)
-	longitude = ndb.StringProperty(default=-79.9609691)
+	latitude = ndb.StringProperty(default='40.444322')
+	longitude = ndb.StringProperty(default='-79.9609691')
 	
 	##########################################################
 	#add / change votes

@@ -29,7 +29,7 @@
 
 #theNavBar {
 	background-color: #6699ff;
-	border-color: #7d94f7;
+	border-color: #6699ff;
 	font-family: "Helvetica Neue";
 	text-align: center;
 	font-size:16px;
@@ -81,11 +81,11 @@
     border-bottom-color: #ffcc66;
 }
 .navbar-default .navbar-toggle {
-    border-color: #7d94f7;
+    border-color: #6699ff;
 }
 .navbar-default .navbar-toggle:hover,
 .navbar-default .navbar-toggle:focus {
-    background-color: #7d94f7;
+    background-color: #6699ff;
 }
 .navbar-default .navbar-toggle .icon-bar {
     background-color: #ffffff;
