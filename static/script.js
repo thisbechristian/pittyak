@@ -528,12 +528,12 @@ function postParameters(xmlHttp, target, parameters)
 function sendPost(){
 	var text = getHtmlValue("PostTextArea");
 	if(text) {
-		if(text.length < 500){
+		if(text.length < 250){
 			clearText("PostTextArea");
 			sendData( {'comment': text, 'location': loct} , '/comment', handlePost);
 		}
 		else{
-			alert("Your post is wayyyyyyy too long!");
+			$('#hemingway-post').fadeIn("slow");
 			document.getElementById("PostTextArea").focus();
 		}
 	}
@@ -543,12 +543,13 @@ function sendSubPost(){
 	var text = getHtmlValue("ReplyTextArea");
 	var id = getHtmlValue("PostId");
 	if(text) {
-		if(text.length < 500){
+		if(text.length < 250){
 			clearText("ReplyTextArea");
+			$('#ReplyModal-close').trigger('click');
 			sendData( {'reply': text, 'id': id} , '/reply', handleSubPost);
 		}
 		else{
-			alert("Your post is wayyyyyyy too long!");
+			$('#hemingway-reply').fadeIn("slow");
 		}
 	}
 }

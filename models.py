@@ -291,6 +291,7 @@ def generate_sub_number(post, user):  ##make sure there is only one picture per 
 def clean(value):
 	result = ''
 	if value:
+		counter = 0
 		for i in range(0, len(value)):
 			c = value[i]
 			if c == "'":
@@ -305,6 +306,12 @@ def clean(value):
 				result += '\\\\'
 			else:
 				result += c
+			if c == ' ':
+				counter = 0
+			if counter > 30:
+				result += ' '
+				counter = 0
+			counter += 1
 	return result
 
 def get_posts_as_json(email, location, user):
