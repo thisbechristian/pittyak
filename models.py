@@ -12,6 +12,8 @@ class Post(ndb.Model):
 	time_created = ndb.IntegerProperty()
 	profile_picture = ndb.IntegerProperty()
 	location = ndb.StringProperty()
+	latitude = ndb.StringProperty(default=40.444322)
+	longitude = ndb.StringProperty(default=-79.9609691)
 	
 	##########################################################
 	#add / change votes
@@ -351,6 +353,8 @@ def build_posts_json(posts):
 		result += '"vote_count":"' + str(post.vote_count) + '",'
 		result += '"up_voted":"' + str(post.up_voted) + '",'
 		result += '"down_voted":"' + str(post.down_voted) + '",'
+		result += '"latitude":"' + str(post.latitude) + '",'
+		result += '"longitude":"' + str(post.longitude) + '",'
 		result += '"image":"/pictures/icons/' + str(post.profile_picture) + '.png"}'
   	result += ']'
   	complete = '{"posts":' + result + '}'
@@ -375,11 +379,13 @@ def build_sub_posts_json(post):
   	result += ']'
   	return result;
 
-def create_post(user,text,location):
+def create_post(user,text,location,lat,lng):
 	post = Post(parent=get_post_ancestor())
 	post.user = user
 	post.text = text
 	post.location = location
+	post.latitude = lat
+	post.longitude = lng
 	post.time_created = int(time.time() * 1000)
 	post.profile_picture = 0;
 	post.put()

@@ -5,12 +5,23 @@ var login = false;
 var admin = false;
 var timeOrder = true;
 var loct = "GLOBAL";
+var latitude = 40.444322;
+var longitude = -79.9609691;
 var location_filter = "GLOBAL";
 var user_filter = false;
 
-if (navigator.geolocation) 
-{
-	navigator.geolocation.watchPosition(showPosition);
+if (navigator.geolocation) {
+	navigator.geolocation.watchPosition(
+		showPosition,
+		function(error){
+			console.log(error);
+		},
+		{ 
+			timeout: 60000,
+			enableHighAccuracy: true,
+			maximumAge: 0 
+		}
+	);
 }
 
 $(window).load(function() {
@@ -183,6 +194,7 @@ function convertPostToHtml(post) {
 	text +=	'<a href="#" data-toggle="modal" data-target="#ReplyModal" data-post="' + post.key + '">';
 	text +=	'<p class="glyphicon glyphicon-share-alt"></p>';
 	text +=	'</a>&nbsp&nbsp&nbsp';
+	text +=	'<a class="glyphicon glyphicon-globe" onclick="toggleLocation(\'' + post.key + '\')"></a>&nbsp&nbsp&nbsp';
 	if (post.sub_comments.length > 0){
 		text +=	'<a class="glyphicon glyphicon-sort-by-attributes-alt" onclick="toggleSubPostArea(\'' + post.key + '\')"></a>&nbsp&nbsp&nbsp';
 	}
@@ -218,6 +230,9 @@ function convertPostToHtml(post) {
 	text += '</div>';
 	text += '<div id="subpost-' + post.key + '"></input></div>';
 	text += '<input id="toggle-' + post.key + '" type="hidden" value="">';
+	text += '<input id="lat-' + post.key + '"type="hidden" value="' + post.latitude + '">';
+	text += '<input id="lng-' + post.key + '"type="hidden" value="' + post.longitude + '">';
+	text += '<input id="location-' + post.key + '"type="hidden" value="">';
 	return text;
 }
 
@@ -304,25 +319,36 @@ function filterForUser(){
 function repositionMap(){
 	//re-position map
 	if(location_filter === "North Oakland"){
-		setHtml('lat', '40.4508487');
-		setHtml('lng', '-79.9637237');
+		changeLocation(40.4508487, -79.9637237);
 	}
 	
 	else if(location_filter === "Central Oakland"){
-		setHtml('lat', '40.4385189');
-		setHtml('lng', '-79.9579115');
+		changeLocation(40.4385189, -79.9579115);
 	}
 	
 	else if(location_filter === "South Oakland"){
-		setHtml('lat', '40.433010');
-		setHtml('lng', '-79.958449');
+		changeLocation(40.433010, -79.958449);
 	}
 	
 	else{
-		setHtml('lat', 'none');
-		setHtml('lng', 'none');
+		changeLocation(latitude, longitude);
 	}
-	initMap();
+}
+
+function toggleLocation(key){
+	var state = 'location-'+key;
+	if(getHtmlValue(state) === "active"){
+		removeRadius(key);
+		repositionMap();
+		setHtmlValue(state, "inactive");
+	}
+	
+	else{
+		var lat = parseFloat(getHtmlValue('lat-'+key));
+		var lng = parseFloat(getHtmlValue('lng-'+key));
+		postRadius(key, lat, lng);
+		setHtmlValue(state, "active");
+	}
 }
 
 function getSortedPosts() {
@@ -462,6 +488,8 @@ function handlePageData(pageData) {
 				p.up_voted = parseBoolean(p.up_voted);
 				p.down_voted = parseBoolean(p.down_voted);
 				p.mine = parseBoolean(p.mine);
+				p.latitude = p.latitude;
+				p.longitude = p.longitude;
 				if (p.sub_comments) {
 					for (var j = 0; j < p.sub_comments.length; j++) {
 						var s = p.sub_comments[j];
@@ -487,8 +515,8 @@ function handlePageData(pageData) {
 //gets location
 function showPosition(position) 
 {
-	var lat = position.coords.latitude;
-	var lon = position.coords.longitude;
+	latitude = position.coords.latitude;
+	longitude = position.coords.longitude;
 	var xmlHttp = createXmlHttp();
 	xmlHttp.onreadystatechange=function() 
 	{
@@ -517,7 +545,7 @@ function showPosition(position)
 			loct="GLOBAL";
 		}
 	}
-	postParameters(xmlHttp, 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon, '');
+	postParameters(xmlHttp, 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latitude + ',' + longitude, '');
 }
 
 function postParameters(xmlHttp, target, parameters) 
@@ -535,7 +563,7 @@ function sendPost(){
 	if(text) {
 		if(text.length < 250){
 			clearText("PostTextArea");
-			sendData( {'comment': text, 'location': loct} , '/comment', handlePost);
+			sendData( {'comment': text, 'location': loct, 'lat': latitude, 'lng': longitude}, '/comment', handlePost);
 		}
 		else{
 			$('#hemingway-post').fadeIn("slow");
@@ -600,7 +628,8 @@ function handleVote(xmlHttp, params){
 //refresh comments
 function loadLoop() {
 	var msSinceLast = (new Date().getTime() - lastLoad);
-	if (msSinceLast > 60000) {
+	if (msSinceLast > 15*60000) {
+		removeAllRadius();
 		loadPosts();
 		lastLoad = new Date().getTime();
 	}

@@ -110,7 +110,9 @@ class PostHandler(webapp2.RequestHandler):
 		if email:
 			text = self.request.get('comment')
 			location = self.request.get('location')
-			models.create_post(email,text,location)
+			lat = self.request.get('lat')
+			lng = self.request.get('lng')
+			models.create_post(email,text,location,lat,lng)
 		self.redirect('/')
 
 class MapHandler(webapp2.RequestHandler):
